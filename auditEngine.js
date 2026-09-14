@@ -583,12 +583,19 @@ export async function processElement(elem, queueKeyword, queueCity) {
     return { skipped: true, reason: 'Duplicate ID already processed', leadId };
   }
 
-  const tags = elem.tags || {};
-  const businessName = tags.name || 'Unnamed Business';
-  const category = tags.amenity || tags.shop || tags.healthcare || tags.office || queueKeyword || 'Business';
-  const city = tags['addr:city'] || queueCity || 'Unknown City';
+  const phone = tags.phone || tags['contact:phone'] || tags['contact:mobile'] || '';
+  const digits = phone.replace(/[^0-9]/g, '');
 
-  // 1. Strict High-Budget Filter: Discard small micro-stores / low-profit shops
+  // 1. Strict Phone Filter: Do NOT enter or qualify leads without a valid phone number!
+  if (!phone || phone === 'Not listed' || phone === 'DM for Contact' || digits.length < 7) {
+    return {
+      skipped: true,
+      reason: `Filtered: No valid contact/phone number available (${businessName})`,
+      leadId
+    };
+  }
+
+  // 2. Strict High-Budget Filter: Discard small micro-stores / low-profit shops
   if (isLowProfitMicroBusiness(businessName, category, tags)) {
     return { 
       skipped: true, 
@@ -597,7 +604,7 @@ export async function processElement(elem, queueKeyword, queueCity) {
     };
   }
 
-  // 2. High-Ticket Niche Classification & Purchasing Power
+  // 3. High-Ticket Niche Classification & Purchasing Power
   const nicheMatch = HIGH_TICKET_NICHES.find(n => 
     n.keywords.some(k => category.toLowerCase().includes(k) || (queueKeyword || '').toLowerCase().includes(k)) ||
     n.category.toLowerCase().includes(category.toLowerCase())
@@ -615,7 +622,6 @@ export async function processElement(elem, queueKeyword, queueCity) {
     tags['addr:postcode']
   ].filter(Boolean);
   const address = addressParts.length > 0 ? addressParts.join(', ') : `${city} Area`;
-  const phone = tags.phone || tags['contact:phone'] || 'Not listed';
 
   const websiteUrl = tags.website || tags['contact:website'] || tags.url || '';
   const now = new Date().toISOString().replace('T', ' ').substring(0, 19);

@@ -25,6 +25,12 @@ export function saveSettings(settings) {
  * Send a qualified lead row directly to Google Sheets via Free Web App Webhook
  */
 export async function syncLeadToGoogleSheet(lead) {
+  // Strict Phone Validation: Do not sync leads without phone numbers!
+  const phoneDigits = String(lead.phone || '').replace(/[^0-9]/g, '');
+  if (!lead.phone || lead.phone === 'Not listed' || lead.phone === 'DM for Contact' || phoneDigits.length < 7) {
+    return { synced: false, reason: 'Skipped: Lead has no valid phone number' };
+  }
+
   const settings = getSettings();
   const webhookUrl = settings.googleSheetWebhookUrl;
 
