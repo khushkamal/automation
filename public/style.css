@@ -59,13 +59,17 @@ body {
 /* App Shell Layout */
 .app-layout {
   display: flex;
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
 /* Left Sidebar */
 .sidebar {
   width: 260px;
+  min-width: 260px;
+  max-width: 260px;
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-subtle);
   display: flex;
@@ -73,22 +77,28 @@ body {
   padding: 24px 16px;
   flex-shrink: 0;
   transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              min-width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
               padding 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
-              margin-left 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
               opacity 0.2s ease,
-              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+              border 0.2s ease;
   position: relative;
   z-index: 50;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-/* Sidebar Collapsed State (Click to Hide/Show) */
+/* Sidebar Collapsed State (Clean Collapse without cutting off content) */
 .app-layout.sidebar-collapsed .sidebar {
-  margin-left: -260px;
-  width: 0;
-  padding: 0;
-  border-right: none;
-  opacity: 0;
-  pointer-events: none;
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  padding: 0 !important;
+  border-right: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden;
+  margin-left: 0 !important;
 }
 
 .btn-sidebar-toggle {
@@ -274,11 +284,15 @@ body {
 /* Main Content Area */
 .main-content {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--bg-app);
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Top Bar */
