@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Business Lead Engine & Website Auditor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <div class="brand-logo-badge">⚡</div>
+        <div class="brand-info">
+          <h1>LEAD ENGINE</h1>
+          <p>Agency Automation Suite</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="tab-leads">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
+          <span>Leads & Audits</span>
+          <span class="nav-badge" id="nav-leads-count">0</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-whatsapp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>WhatsApp Outreach</span>
+          <span class="nav-badge" id="nav-wa-badge">Ready</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-queue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span>Search Queue</span>
+          <span class="nav-badge" id="nav-queue-count">3</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-sheets">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Google Sheets Sync</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-pill">
+          <span class="status-dot online"></span>
+          <span>Overpass API • Free Live</span>
+        </div>
+        <div class="status-pill" id="sidebar-wa-status">
+          <span class="status-dot" id="wa-status-dot"></span>
+          <span id="wa-sidebar-text">WhatsApp: Checking...</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-title">
+          <h2 id="topbar-page-title">Qualified Leads & Audits</h2>
+          <p id="topbar-page-sub">Discover local businesses via OpenStreetMap & run deterministic website inspections</p>
+        </div>
+
+        <div class="topbar-actions">
+          <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:4px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+            <span style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">👤 Team Member:</span>
+            <input type="text" id="input-member-name" placeholder="Your Name" value="Member 1" style="border:none; outline:none; font-size:12px; font-weight:700; color:var(--brand-orange-dark); width:90px; background:transparent;">
+          </div>
+          <button id="btn-export-csv" class="btn btn-secondary btn-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+          <button class="btn btn-emerald btn-sm" id="btn-quick-wa-campaign">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.587 1.961.947 3.031.947 3.179 0 5.765-2.587 5.767-5.766.001-3.181-2.584-5.767-5.767-5.767zm0 10.373c-.931 0-1.802-.279-2.553-.762l-.182-.117-1.572.412.419-1.533-.128-.204c-.529-.844-.808-1.74-.807-2.671.002-2.529 2.059-4.586 4.589-4.586 2.529 0 4.586 2.058 4.586 4.588-.001 2.529-2.058 4.586-4.589 4.586z"/></svg>
+            WhatsApp Campaign
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: LEADS & AUDITOR -->
+      <section id="tab-leads" class="tab-content active page-body">
+        <!-- Metrics Row -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Total Qualified Leads</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="metric-value" id="stat-total">0</div>
+            <div class="metric-footer">Qualified & saved in database</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>🔥 Hot Leads (Score ≥ 80)</span>
+              <span style="color:#fb7185; font-weight:700;">HOT</span>
+            </div>
+            <div class="metric-value" style="color:#fb7185;" id="stat-hot">0</div>
+            <div class="metric-footer">Immediate website & design pitch</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>🌐 No Website Leads</span>
+              <span style="color:#fbbf24; font-weight:700;">HIGH VALUE</span>
+            </div>
+            <div class="metric-value" style="color:#fbbf24;" id="stat-no-web">0</div>
+            <div class="metric-footer">Prime web development targets</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>🛡️ Deduplicated Places</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="metric-value" style="color:#a78bfa;" id="stat-dedup">0</div>
+            <div class="metric-footer">Protected from duplicate entries</div>
+          </div>
+        </div>
+
+        <!-- Search Discovery Panel -->
+        <div class="search-card">
+          <form id="quick-run-form" class="search-form">
+            <div class="form-group">
+              <label for="input-keyword">Category / Keyword (OSM Tag)</label>
+              <input type="text" id="input-keyword" class="form-control" placeholder="e.g. dentist, salon, restaurant, gym, clinic, hotel" required>
+            </div>
+
+            <div class="form-group">
+              <label for="input-city">Target City / Area</label>
+              <input type="text" id="input-city" class="form-control" placeholder="e.g. Mumbai, Delhi, Bangalore, London" required>
+            </div>
+
+            <div class="form-group">
+              <label for="input-max">Max Leads</label>
+              <input type="number" id="input-max" class="form-control" value="20" min="1" max="50">
+            </div>
+
+            <div>
+              <button type="submit" id="btn-run-audit" class="btn btn-primary" style="width:100%; height:42px;">
+                <span>🚀 Run Instant Audit</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Live Status Banner -->
+        <div id="execution-status" class="status-banner hidden">
+          <div class="spinner"></div>
+          <div>
+            <div style="font-weight:600; font-size:13px; color:#60a5fa;" id="status-text">Querying OpenStreetMap...</div>
+            <div style="font-size:12px; color:var(--text-secondary);" id="status-detail">Please wait while businesses are discovered and audited.</div>
+          </div>
+        </div>
+
+        <!-- Leads Data Table Card -->
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="filter-group">
+              <input type="text" id="search-input" class="form-control filter-input" placeholder="Search by name, city, phone...">
+              <select id="filter-priority" class="form-control">
+                <option value="All">All Priorities</option>
+                <option value="Hot">🔥 Hot (Score 80-100)</option>
+                <option value="Warm">⚡ Warm (Score 60-79)</option>
+                <option value="Potential">💡 Potential (Score 40-59)</option>
+              </select>
+              <select id="filter-service" class="form-control">
+                <option value="All">All Services</option>
+                <option value="Website Development">Website Development</option>
+                <option value="Mobile Optimization">Mobile Optimization</option>
+                <option value="Online Booking System">Online Booking System</option>
+                <option value="WhatsApp Automation">WhatsApp Automation</option>
+                <option value="Website Redesign">Website Redesign</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Score</th>
+                  <th>Business & Location</th>
+                  <th>Category</th>
+                  <th>Phone Number</th>
+                  <th>Website & Signals</th>
+                  <th>Recommended Service</th>
+                  <th>Audit Analysis</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="leads-tbody">
+                <tr>
+                  <td colspan="8" class="empty-state-cell">
+                    <div class="empty-icon">🔍</div>
+                    <h3 style="color:#fff; font-size:15px; margin-bottom:4px;">No qualified leads generated yet</h3>
+                    <p style="font-size:12px;">Run a search above or start your queue to discover local businesses.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: WHATSAPP OUTREACH CENTER -->
+      <section id="tab-whatsapp" class="tab-content page-body">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px;">
+          <!-- QR Code State -->
+          <div id="wa-qr-container" style="text-align:center; padding:20px;">
+            <h3 style="color:#fff; font-size:18px; margin-bottom:8px;">Link Your WhatsApp Business</h3>
+            <p style="color:var(--text-secondary); font-size:13px; max-width:480px; margin:0 auto 20px;">
+              Scan the QR code from WhatsApp on your phone (<strong>Settings / Menu ➔ Linked Devices ➔ Link a Device</strong>).
+            </p>
+            <div id="wa-qr-image-box" style="background:#fff; padding:16px; border-radius:var(--radius-md); display:inline-block; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+              <div class="spinner" style="margin:40px auto;"></div>
+            </div>
+            <p style="font-size:12px; color:var(--text-tertiary); margin-top:14px;">100% Free Direct Web Socket connection. No API subscriptions needed.</p>
+          </div>
+
+          <!-- Connected State -->
+          <div id="wa-connected-container" class="hidden" style="display:flex; flex-direction:column; gap:20px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:var(--radius-sm); padding:16px 20px;">
+              <div>
+                <div style="font-size:11px; font-weight:700; color:var(--brand-emerald); text-transform:uppercase; letter-spacing:0.5px;">🟢 System Connected</div>
+                <div style="font-size:18px; font-weight:700; color:#fff; font-family:var(--font-mono); margin-top:2px;" id="wa-connected-number">+91...</div>
+              </div>
+              <button id="btn-wa-logout" class="btn btn-secondary btn-sm" style="color:#fb7185;">Disconnect Device</button>
+            </div>
+
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:20px;">
+              <h4 style="color:#fff; font-size:15px; margin-bottom:6px;">Automated Outreach Dispatcher</h4>
+              <p style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;">
+                Loops through qualified leads with valid phone numbers and automatically delivers their custom website audit pitch. Includes randomized 6–10s anti-ban delays.
+              </p>
+              
+              <div style="display:flex; gap:12px;">
+                <button id="btn-start-wa-campaign" class="btn btn-emerald">
+                  🚀 Start 1-Click Automated Campaign
+                </button>
+                <button id="btn-stop-wa-campaign" class="btn btn-secondary hidden" style="color:#fb7185;">
+                  ⏹ Stop Campaign
+                </button>
+              </div>
+            </div>
+
+            <!-- Campaign Progress Indicator -->
+            <div id="wa-campaign-progress-box" class="hidden" style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:var(--radius-sm); padding:16px;">
+              <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:8px;">
+                <span id="wa-campaign-status-text" style="color:#60a5fa;">Dispatching pitches in background...</span>
+                <span id="wa-campaign-counter" style="color:#fff; font-family:var(--font-mono);">0 / 0</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-secondary);" id="wa-campaign-current-target">Current: ...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: SEARCH QUEUE -->
+      <section id="tab-queue" class="tab-content page-body">
+        <div class="search-card">
+          <h3 style="font-size:16px; font-weight:700; color:#fff;">Add Search to Queue</h3>
+          <form id="add-queue-form" style="display:grid; grid-template-columns:2fr 2fr 1fr auto; gap:12px; align-items:flex-end;">
+            <div class="form-group">
+              <label>Keyword / Category</label>
+              <input type="text" id="queue-keyword" class="form-control" placeholder="e.g. dentist, clinic" required>
+            </div>
+            <div class="form-group">
+              <label>City</label>
+              <input type="text" id="queue-city" class="form-control" placeholder="e.g. Mumbai" required>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="queue-status" class="form-control">
+                <option value="Ready">Ready</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="height:42px;">+ Add Item</button>
+          </form>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <h4 style="font-size:14px; font-weight:600; color:#fff;">Search Queue List</h4>
+            <button id="btn-run-all-queue" class="btn btn-primary btn-sm">▶️ Run All "Ready" Searches</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Keyword</th>
+                  <th>City</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="queue-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: GOOGLE SHEETS SYNC -->
+      <section id="tab-sheets" class="tab-content page-body">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:20px;">
+          <div>
+            <h3 style="font-size:16px; font-weight:700; color:#fff;">📊 Google Sheets Live Auto-Sync</h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
+              Connect your Google Sheet via free Apps Script webhook so every qualified lead is automatically inserted in real time.
+            </p>
+          </div>
+
+          <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-weight:600; font-size:13px; color:#fff; margin-bottom:8px;">Quick 1-Minute Setup Instructions:</div>
+            <ol style="font-size:13px; color:var(--text-secondary); margin-left:20px; line-height:1.6;">
+              <li>Open your Google Sheet (named <strong>Automation</strong>).</li>
+              <li>Go to <strong>Extensions > Apps Script</strong>.</li>
+              <li>Paste the code from <a href="file:///d:/Project/Automation/GoogleAppsScript_Sync.js" style="color:var(--brand-primary);">GoogleAppsScript_Sync.js</a> and click Save.</li>
+              <li>Click <strong>Deploy > New Deployment > Web app</strong> (Set 'Who has access' to <strong>Anyone</strong>).</li>
+              <li>Copy the Web app URL and paste it below.</li>
+            </ol>
+          </div>
+
+          <form id="sheets-config-form" style="display:flex; flex-direction:column; gap:12px;">
+            <div class="form-group">
+              <label for="input-webhook-url">Google Apps Script Web App URL</label>
+              <input type="url" id="input-webhook-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec" required>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <button type="button" id="btn-sync-all-now" class="btn btn-secondary">🚀 Sync All Saved Leads Now</button>
+              <button type="submit" id="btn-save-webhook" class="btn btn-primary">💾 Save Webhook URL</button>
+            </div>
+          </form>
+
+          <div id="sheets-sync-status" class="status-banner hidden"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Outreach Message Modal -->
+  <div id="outreach-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>💬 Tailored Client Pitch</h3>
+        <button id="btn-close-outreach" class="modal-close-btn">&times;</button>
+      </div>
+      <div>
+        <div id="outreach-lead-info" style="margin-bottom:12px;"></div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Outreach Pitch Message</label>
+          <div style="display:flex; gap:6px;">
+            <button id="btn-pitch-lang-hi" class="btn btn-secondary btn-sm" style="padding:3px 8px; font-size:11px;">🇮🇳 Hinglish</button>
+            <button id="btn-pitch-lang-en" class="btn btn-ghost btn-sm" style="padding:3px 8px; font-size:11px;">🇬🇧 English</button>
+          </div>
+        </div>
+
+        <textarea id="outreach-text" class="pitch-textarea" rows="6"></textarea>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+          <button id="btn-copy-outreach" class="btn btn-secondary">📋 Copy Pitch</button>
+          <a id="btn-whatsapp-outreach" href="#" target="_blank" class="btn btn-emerald">💬 Send on WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

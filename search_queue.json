@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "keyword": "dentist",
+    "city": "Mumbai",
+    "status": "Completed",
+    "createdAt": "2026-09-14T11:21:01.962Z",
+    "lastRun": "2026-09-14T11:21:28.777Z"
+  },
+  {
+    "id": "2",
+    "keyword": "restaurant",
+    "city": "Delhi",
+    "status": "Completed",
+    "createdAt": "2026-09-14T11:21:01.963Z",
+    "lastRun": "2026-09-14T11:33:38.080Z"
+  },
+  {
+    "id": "3",
+    "keyword": "salon",
+    "city": "Bangalore",
+    "status": "Completed",
+    "createdAt": "2026-09-14T11:21:01.963Z",
+    "lastRun": "2026-09-14T11:34:07.924Z"
+  }
+]

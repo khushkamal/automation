@@ -1,0 +1,384 @@
+{
+  "name": "LOCAL BUSINESS LEAD GENERATION AUDIT",
+  "version": 1,
+  "flow": [
+    {
+      "id": 1,
+      "module": "google-sheets:watchRows",
+      "version": 2,
+      "parameters": {
+        "spreadsheetId": "Automation",
+        "sheetId": "Search Queue",
+        "tableFirstRow": "A1:C1",
+        "maxResults": 1
+      },
+      "filter": {
+        "name": "Only Ready searches",
+        "conditions": [
+          [
+            {
+              "a": "{{1.Status}}",
+              "o": "text:equal",
+              "b": "Ready"
+            }
+          ]
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": -600,
+          "y": 0,
+          "name": "Google Sheets - Watch Search Queue"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "http:makeRequest",
+      "version": 3,
+      "parameters": {
+        "url": "https://overpass-api.de/api/interpreter",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "User-Agent",
+            "value": "Make-Local-Business-Lead-Workflow/1.0"
+          },
+          {
+            "name": "Content-Type",
+            "value": "text/plain"
+          }
+        ],
+        "body": "[out:json][timeout:15];\narea[\"name\"=\"{{1.City}}\"][\"boundary\"=\"administrative\"]->.searchArea;\n(\n  nwr[\"amenity\"=\"{{1.Keyword}}\"](area.searchArea);\n  nwr[\"shop\"=\"{{1.Keyword}}\"](area.searchArea);\n  nwr[\"office\"=\"{{1.Keyword}}\"](area.searchArea);\n);\nout center 20;",
+        "parseResponse": true,
+        "timeout": 15
+      },
+      "metadata": {
+        "designer": {
+          "x": -350,
+          "y": 0,
+          "name": "HTTP - Search Overpass"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "module": "builtin:BasicFeeder",
+      "version": 1,
+      "parameters": {
+        "array": "{{2.data.elements}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": -100,
+          "y": 0,
+          "name": "Iterator - Iterate Businesses"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "module": "datastore:checkRecordExistence",
+      "version": 1,
+      "parameters": {
+        "datastoreId": "Local Lead Place IDs",
+        "key": "{{3.type}}:{{3.id}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 150,
+          "y": 0,
+          "name": "Data Store - Check Duplicate"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 6,
+              "module": "google-sheets:addRow",
+              "version": 2,
+              "parameters": {
+                "spreadsheetId": "Automation",
+                "sheetId": "Leads",
+                "values": {
+                  "1": "{{3.type}}:{{3.id}}",
+                  "2": "{{ifempty(3.tags.name; \"Unnamed Business\")}}",
+                  "3": "{{ifempty(3.tags.amenity; ifempty(3.tags.shop; ifempty(3.tags.office; 1.Keyword)))}}",
+                  "4": "{{ifempty(3.tags.`addr:city`; 1.City)}}",
+                  "5": "{{trim(join(array(3.tags.`addr:housenumber`; 3.tags.`addr:street`; 3.tags.`addr:city`; 3.tags.`addr:postcode`); \", \"))}}",
+                  "6": "{{ifempty(3.tags.phone; \"Not listed\")}}",
+                  "7": "",
+                  "8": "Not available",
+                  "9": "Not available",
+                  "10": "Not available",
+                  "11": "No Website",
+                  "12": "Poor",
+                  "13": "No",
+                  "14": "Not visible",
+                  "15": "Not visible",
+                  "16": "Not visible",
+                  "17": "Unknown",
+                  "18": "High Opportunity",
+                  "19": "Rule-based audit; no AI API used",
+                  "20": 85,
+                  "21": "Hot",
+                  "22": "Website Development",
+                  "23": "Business has no publicly listed website",
+                  "24": "Hi {{ifempty(3.tags.name; \"Business Owner\")}}, noticed your {{ifempty(3.tags.amenity; ifempty(3.tags.shop; 1.Keyword))}} in {{ifempty(3.tags.`addr:city`; 1.City)}} does not have an active website. We can help you build a modern, high-converting website to attract local clients.",
+                  "25": "OpenStreetMap / Overpass",
+                  "26": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}"
+                }
+              },
+              "metadata": {
+                "designer": {
+                  "x": 650,
+                  "y": -150,
+                  "name": "Write No Website Lead"
+                }
+              }
+            },
+            {
+              "id": 7,
+              "module": "datastore:addOrReplaceRecord",
+              "version": 1,
+              "parameters": {
+                "datastoreId": "Local Lead Place IDs",
+                "key": "{{3.type}}:{{3.id}}",
+                "record": {
+                  "id": "{{3.type}}:{{3.id}}",
+                  "processedAt": "{{now}}"
+                }
+              },
+              "metadata": {
+                "designer": {
+                  "x": 900,
+                  "y": -150,
+                  "name": "Save No Website ID"
+                }
+              }
+            }
+          ],
+          "filter": {
+            "name": "New businesses without websites",
+            "conditions": [
+              [
+                {
+                  "a": "{{4.exists}}",
+                  "o": "boolean:equal",
+                  "b": false
+                },
+                {
+                  "a": "{{3.tags.website}}",
+                  "o": "exists:not"
+                },
+                {
+                  "a": "{{3.tags.`contact:website`}}",
+                  "o": "exists:not"
+                },
+                {
+                  "a": "{{3.tags.url}}",
+                  "o": "exists:not"
+                }
+              ]
+            ]
+          }
+        },
+        {
+          "flow": [
+            {
+              "id": 8,
+              "module": "http:makeRequest",
+              "version": 3,
+              "parameters": {
+                "url": "{{ifempty(3.tags.website; ifempty(3.tags.`contact:website`; 3.tags.url))}}",
+                "method": "GET",
+                "followRedirect": true,
+                "timeout": 20
+              },
+              "metadata": {
+                "designer": {
+                  "x": 400,
+                  "y": 150,
+                  "name": "Fetch Website"
+                }
+              }
+            },
+            {
+              "id": 9,
+              "module": "util:SetVariables",
+              "version": 1,
+              "parameters": {
+                "variables": [
+                  {
+                    "name": "siteUrl",
+                    "value": "{{ifempty(3.tags.website; ifempty(3.tags.`contact:website`; 3.tags.url))}}"
+                  },
+                  {
+                    "name": "isHttps",
+                    "value": "{{if(contains(lower(8.data); \"https://\"); \"Yes\"; if(startsWith(lower(ifempty(3.tags.website; ifempty(3.tags.`contact:website`; 3.tags.url))); \"https://\"); \"Yes\"; \"No\"))}}"
+                  },
+                  {
+                    "name": "hasViewport",
+                    "value": "{{if(contains(lower(8.data); \"name=\\\"viewport\\\"\") | contains(lower(8.data); \"name='viewport'\"); \"Yes\"; \"No\")}}"
+                  },
+                  {
+                    "name": "hasPhone",
+                    "value": "{{if(contains(lower(8.data); \"tel:\") | contains(lower(8.data); \"call\"); \"Detected\"; \"Not detected\")}}"
+                  },
+                  {
+                    "name": "hasCTA",
+                    "value": "{{if(contains(lower(8.data); \"contact\") | contains(lower(8.data); \"quote\") | contains(lower(8.data); \"get started\") | contains(lower(8.data); \"inquiry\"); \"Detected\"; \"Not detected\")}}"
+                  },
+                  {
+                    "name": "hasWhatsApp",
+                    "value": "{{if(contains(lower(8.data); \"wa.me\") | contains(lower(8.data); \"whatsapp.com\") | contains(lower(8.data); \"api.whatsapp\"); \"Detected\"; \"Not detected\")}}"
+                  },
+                  {
+                    "name": "hasBooking",
+                    "value": "{{if(contains(lower(8.data); \"calendly.com\") | contains(lower(8.data); \"acuityscheduling.com\") | contains(lower(8.data); \"appointment\") | contains(lower(8.data); \"book now\") | contains(lower(8.data); \"schedule\"); \"Detected\"; \"Not detected\")}}"
+                  },
+                  {
+                    "name": "hasTracking",
+                    "value": "{{if(contains(lower(8.data); \"googletagmanager.com\") | contains(lower(8.data); \"fbq(\") | contains(lower(8.data); \"connect.facebook.net\") | contains(lower(8.data); \"google_conversion\"); \"Detected\"; \"Not detected\")}}"
+                  },
+                  {
+                    "name": "calculatedScore",
+                    "value": "{{(if(isHttps = \"No\"; 20; 0) + if(hasViewport = \"No\"; 25; 0) + if(hasWhatsApp = \"Not detected\"; 15; 0) + if(hasBooking = \"Not detected\"; 20; 0) + if(hasCTA = \"Not detected\"; 10; 0) + if(hasTracking = \"Not detected\"; 10; 0))}}"
+                  },
+                  {
+                    "name": "leadPriority",
+                    "value": "{{if(calculatedScore >= 80; \"Hot\"; if(calculatedScore >= 60; \"Warm\"; if(calculatedScore >= 40; \"Potential\"; \"Low\")))}}"
+                  },
+                  {
+                    "name": "recommendedService",
+                    "value": "{{if(hasViewport = \"No\"; \"Mobile Optimization\"; if(isHttps = \"No\"; \"Website Redesign\"; if(hasBooking = \"Not detected\"; \"Online Booking System\"; if(hasWhatsApp = \"Not detected\"; \"WhatsApp Automation\"; \"Digital Marketing Setup\"))))}}"
+                  },
+                  {
+                    "name": "auditReason",
+                    "value": "{{join(array(if(isHttps = \"No\"; \"No SSL/HTTPS\"; empty); if(hasViewport = \"No\"; \"Not Mobile Responsive\"; empty); if(hasWhatsApp = \"Not detected\"; \"No WhatsApp Chat Hook\"; empty); if(hasBooking = \"Not detected\"; \"Missing Online Booking\"; empty); if(hasTracking = \"Not detected\"; \"No Retargeting Pixel/Analytics\"; empty)); \", \")}}"
+                  },
+                  {
+                    "name": "outreachMessage",
+                    "value": "Hi {{ifempty(3.tags.name; \"Business Owner\")}}, I reviewed {{siteUrl}} for your {{ifempty(3.tags.amenity; ifempty(3.tags.shop; 1.Keyword))}} in {{ifempty(3.tags.`addr:city`; 1.City)}} and noticed opportunities for improvement: {{join(array(if(hasViewport = \"No\"; \"mobile responsiveness\"; empty); if(hasWhatsApp = \"Not detected\"; \"direct WhatsApp chat\"; empty); if(hasBooking = \"Not detected\"; \"instant online appointment booking\"; empty)); \", \")}}. Would you be open to a quick 5-min demo?"
+                  }
+                ]
+              },
+              "metadata": {
+                "designer": {
+                  "x": 650,
+                  "y": 150,
+                  "name": "Rule-Based Audit & Scoring"
+                }
+              }
+            },
+            {
+              "id": 10,
+              "module": "google-sheets:addRow",
+              "version": 2,
+              "parameters": {
+                "spreadsheetId": "Automation",
+                "sheetId": "Leads",
+                "values": {
+                  "1": "{{3.type}}:{{3.id}}",
+                  "2": "{{ifempty(3.tags.name; \"Unnamed Business\")}}",
+                  "3": "{{ifempty(3.tags.amenity; ifempty(3.tags.shop; ifempty(3.tags.office; 1.Keyword)))}}",
+                  "4": "{{ifempty(3.tags.`addr:city`; 1.City)}}",
+                  "5": "{{trim(join(array(3.tags.`addr:housenumber`; 3.tags.`addr:street`; 3.tags.`addr:city`; 3.tags.`addr:postcode`); \", \"))}}",
+                  "6": "{{ifempty(3.tags.phone; \"Not listed\")}}",
+                  "7": "{{9.siteUrl}}",
+                  "8": "Not available",
+                  "9": "Not available",
+                  "10": "Not available",
+                  "11": "Live",
+                  "12": "{{if(9.calculatedScore > 60; \"Needs Improvement\"; \"Fair\")}}",
+                  "13": "{{9.hasViewport}}",
+                  "14": "{{9.hasCTA}}",
+                  "15": "{{9.hasWhatsApp}}",
+                  "16": "{{9.hasBooking}}",
+                  "17": "{{9.hasTracking}}",
+                  "18": "{{if(9.calculatedScore >= 60; \"High Opportunity\"; \"Moderate Opportunity\")}}",
+                  "19": "Rule-based audit; no AI API used",
+                  "20": "{{9.calculatedScore}}",
+                  "21": "{{9.leadPriority}}",
+                  "22": "{{9.recommendedService}}",
+                  "23": "{{9.auditReason}}",
+                  "24": "{{9.outreachMessage}}",
+                  "25": "OpenStreetMap / Overpass",
+                  "26": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}"
+                }
+              },
+              "filter": {
+                "name": "Lead Score >= 40",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{9.calculatedScore}}",
+                      "o": "number:greaterThanOrEqual",
+                      "b": 40
+                    }
+                  ]
+                ]
+              },
+              "metadata": {
+                "designer": {
+                  "x": 900,
+                  "y": 150,
+                  "name": "Write Website Lead"
+                }
+              }
+            },
+            {
+              "id": 11,
+              "module": "datastore:addOrReplaceRecord",
+              "version": 1,
+              "parameters": {
+                "datastoreId": "Local Lead Place IDs",
+                "key": "{{3.type}}:{{3.id}}",
+                "record": {
+                  "id": "{{3.type}}:{{3.id}}",
+                  "processedAt": "{{now}}"
+                }
+              },
+              "metadata": {
+                "designer": {
+                  "x": 1150,
+                  "y": 150,
+                  "name": "Save Website ID"
+                }
+              }
+            }
+          ],
+          "filter": {
+            "name": "Businesses with websites",
+            "conditions": [
+              [
+                {
+                  "a": "{{4.exists}}",
+                  "o": "boolean:equal",
+                  "b": false
+                },
+                {
+                  "a": "{{ifempty(3.tags.website; ifempty(3.tags.`contact:website`; 3.tags.url))}}",
+                  "o": "exists"
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "designer": {
+          "x": 350,
+          "y": 0,
+          "name": "Router - Website Decision"
+        }
+      }
+    }
+  ]
+}
