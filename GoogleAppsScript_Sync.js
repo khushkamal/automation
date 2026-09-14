@@ -60,23 +60,31 @@ function setupSheet() {
     .setFontColor("#38bdf8");
   sheet.setFrozenRows(1);
 
-  // Set Phone column (Column 6) and Lead ID (Column 1) to Plain Text to avoid formula #ERROR!
+  // Set Phone column (Column 6, F) and Lead ID (Column 1, A) to Plain Text format (@)
   sheet.getRange(1, 1, sheet.getMaxRows(), 1).setNumberFormat("@");
   sheet.getRange(1, 6, sheet.getMaxRows(), 1).setNumberFormat("@");
 }
 
-// Helper: Sanitize row to prevent Google Sheets from interpreting '+' or '=' as mathematical formulas
-function sanitizeRow(row) {
-  if (!row || !Array.isArray(row)) return [];
-  return row.map(function(val) {
-    if (val === null || val === undefined) return "";
-    var s = String(val).trim();
-    // If starts with '+' or '=', force Google Sheets plain text with leading quote
-    if (s.charAt(0) === "+" || s.charAt(0) === "=") {
-      return "'" + s;
-    }
-    return val;
-  });
+// 1.1 Helper: Fix existing #ERROR! in the current sheet
+function cleanExistingErrors() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Leads") || ss.getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  // Format entire Column F (Phone) as Plain Text
+  sheet.getRange(2, 6, lastRow - 1, 1).setNumberFormat("@");
+  
+  // Format entire Column A (Lead ID) as Plain Text
+  sheet.getRange(2, 1, lastRow - 1, 1).setNumberFormat("@");
+}
+
+// Helper: Safely insert row as raw text to prevent Google Sheets #ERROR! formula parse
+function appendSafeRow(sheet, rowData) {
+  var lastRow = sheet.getLastRow() + 1;
+  // Ensure Column 6 (Phone) is text format before writing
+  sheet.getRange(lastRow, 6).setNumberFormat("@");
+  sheet.getRange(lastRow, 1, 1, rowData.length).setValues([rowData]);
 }
 
 // 2. HTTP Webhook Listener: Auto appends leads row-by-row
@@ -92,16 +100,16 @@ function doPost(e) {
     }
     
     if (contents.action === "addLead" && contents.lead) {
-      var cleanRow = sanitizeRow(contents.lead);
-      sheet.appendRow(cleanRow);
+      appendSafeRow(sheet, contents.lead);
       return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Lead added" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
     
     if (contents.action === "syncAll" && contents.leads) {
-      for (var i = 0; i < contents.leads.length; i++) {
-        var cleanRow = sanitizeRow(contents.leads[i]);
-        sheet.appendRow(cleanRow);
+      var startRow = sheet.getLastRow() + 1;
+      if (contents.leads.length > 0) {
+        sheet.getRange(startRow, 6, contents.leads.length, 1).setNumberFormat("@");
+        sheet.getRange(startRow, 1, contents.leads.length, contents.leads[0].length).setValues(contents.leads);
       }
       return ContentService.createTextOutput(JSON.stringify({ status: "success", count: contents.leads.length }))
         .setMimeType(ContentService.MimeType.JSON);
