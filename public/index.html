@@ -24,6 +24,11 @@
           <h1>LEAD ENGINE</h1>
           <p>Agency Automation Suite</p>
         </div>
+        <button id="btn-collapse-sidebar" class="btn-sidebar-collapse" title="Hide Sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
       </div>
 
       <nav class="sidebar-nav">
@@ -77,9 +82,18 @@
     <main class="main-content">
       <!-- Top Navigation Bar -->
       <header class="topbar">
-        <div class="topbar-title">
-          <h2 id="topbar-page-title">Qualified Leads & Audits</h2>
-          <p id="topbar-page-sub">Discover local businesses via OpenStreetMap & run deterministic website inspections</p>
+        <div style="display:flex; align-items:center; gap:14px;">
+          <button id="btn-toggle-sidebar" class="btn-sidebar-toggle" title="Toggle Sidebar (Show/Hide)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="topbar-title">
+            <h2 id="topbar-page-title">Qualified Leads & Audits</h2>
+            <p id="topbar-page-sub">Discover local businesses via OpenStreetMap & run deterministic website inspections</p>
+          </div>
         </div>
 
         <div class="topbar-actions">

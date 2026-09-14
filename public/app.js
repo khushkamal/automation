@@ -55,6 +55,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Sidebar Show/Hide Toggle Logic (Click to Show, Click to Hide)
+  const appLayout = document.querySelector('.app-layout');
+  const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+  const btnCollapseSidebar = document.getElementById('btn-collapse-sidebar');
+
+  function toggleSidebar() {
+    if (!appLayout) return;
+    appLayout.classList.toggle('sidebar-collapsed');
+    const isCollapsed = appLayout.classList.contains('sidebar-collapsed');
+    localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+  }
+
+  if (btnToggleSidebar) {
+    btnToggleSidebar.addEventListener('click', toggleSidebar);
+  }
+
+  if (btnCollapseSidebar) {
+    btnCollapseSidebar.addEventListener('click', toggleSidebar);
+  }
+
+  // Restore saved sidebar preference if any
+  if (localStorage.getItem('sidebar_collapsed') === 'true' && appLayout) {
+    appLayout.classList.add('sidebar-collapsed');
+  }
+
   // Metric Stats Elements
   const statTotal = document.getElementById('stat-total');
   const statHot = document.getElementById('stat-hot');
