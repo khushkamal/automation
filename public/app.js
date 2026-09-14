@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const tabTitles = {
     'tab-leads': { title: 'Qualified Leads & Audits', sub: 'Discover local businesses via OpenStreetMap & run deterministic website inspections' },
+    'tab-instagram': { title: 'Instagram Business Lead Discovery', sub: 'Random qualified D2C sellers, boutiques, home bakers & service brands with public WhatsApp' },
     'tab-whatsapp': { title: 'WhatsApp Outreach Center', sub: '100% Free Direct Web Socket automated client messenger' },
     'tab-queue': { title: 'Search Queue Manager', sub: 'Manage automated searches for different cities and business categories' },
     'tab-sheets': { title: 'Google Sheets Live Sync', sub: 'Automatic real-time row insertion into your Google Sheet' }
@@ -113,7 +114,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSyncAllNow = document.getElementById('btn-sync-all-now');
   const sheetsSyncStatus = document.getElementById('sheets-sync-status');
 
+  // Instagram Discovery Elements
+  const btnGenerateRandomIg = document.getElementById('btn-generate-random-ig');
+  const igBatchSize = document.getElementById('ig-batch-size');
+  const igBtnSpinner = document.getElementById('ig-btn-spinner');
+  const igBtnText = document.getElementById('ig-btn-text');
+  const igLeadsTbody = document.getElementById('ig-leads-tbody');
+  const igSearchInput = document.getElementById('ig-search-input');
+  const igFilterNiche = document.getElementById('ig-filter-niche');
+  const igTableCount = document.getElementById('ig-table-count');
+  const statIgTotal = document.getElementById('stat-ig-total');
+  const statIgWa = document.getElementById('stat-ig-wa');
+  const statIgScore = document.getElementById('stat-ig-score');
+  const statIgPitches = document.getElementById('stat-ig-pitches');
+  const navIgBadge = document.getElementById('nav-ig-badge');
+
+  // Instagram Manual Modal Elements
+  const btnOpenIgManualModal = document.getElementById('btn-open-ig-manual-modal');
+  const igManualModal = document.getElementById('ig-manual-modal');
+  const btnCloseIgManual = document.getElementById('btn-close-ig-manual');
+  const btnCancelIgManual = document.getElementById('btn-cancel-ig-manual');
+  const formAddIgManual = document.getElementById('form-add-ig-manual');
+  const igManualHandle = document.getElementById('ig-manual-handle');
+  const igManualName = document.getElementById('ig-manual-name');
+  const igManualCategory = document.getElementById('ig-manual-category');
+  const igManualCity = document.getElementById('ig-manual-city');
+  const igManualPhone = document.getElementById('ig-manual-phone');
+  const igManualBio = document.getElementById('ig-manual-bio');
+
   let currentLeads = [];
+  let currentInstagramLeads = [];
 
   // 1. Fetch Stats
   async function fetchStats() {
@@ -262,6 +292,185 @@ document.addEventListener('DOMContentLoaded', () => {
         const leadId = e.target.getAttribute('data-id');
         const lead = currentLeads.find(l => l.leadId === leadId);
         if (lead) openOutreachModal(lead);
+      });
+    });
+  }
+
+  // 3.1 Fetch & Render Instagram Leads
+  async function fetchInstagramLeads() {
+    try {
+      const res = await fetch('/api/instagram/leads');
+      if (!res.ok) throw new Error(`Instagram Leads HTTP error ${res.status}`);
+      const data = await res.json();
+      currentInstagramLeads = data.leads || [];
+
+      // Update Instagram Stats
+      if (statIgTotal) statIgTotal.textContent = currentInstagramLeads.length;
+      const waReadyCount = currentInstagramLeads.filter(l => l.phone && l.phone !== 'DM for Contact' && l.phone !== 'Not listed').length;
+      if (statIgWa) statIgWa.textContent = waReadyCount;
+      if (statIgPitches) statIgPitches.textContent = currentInstagramLeads.length;
+      if (navIgBadge) navIgBadge.textContent = currentInstagramLeads.length > 0 ? `${currentInstagramLeads.length} Hot` : 'D2C Hot';
+
+      filterAndRenderInstagramTable();
+    } catch (err) {
+      console.error('Error fetching Instagram leads:', err);
+    }
+  }
+
+  function filterAndRenderInstagramTable() {
+    if (!igLeadsTbody) return;
+    const search = igSearchInput ? igSearchInput.value.toLowerCase().trim() : '';
+    const niche = igFilterNiche ? igFilterNiche.value : 'All';
+
+    let filtered = currentInstagramLeads;
+    if (niche !== 'All') {
+      filtered = filtered.filter(l => l.category?.toLowerCase() === niche.toLowerCase());
+    }
+    if (search) {
+      filtered = filtered.filter(l =>
+        (l.businessName && l.businessName.toLowerCase().includes(search)) ||
+        (l.instagramHandle && l.instagramHandle.toLowerCase().includes(search)) ||
+        (l.city && l.city.toLowerCase().includes(search)) ||
+        (l.phone && l.phone.toLowerCase().includes(search)) ||
+        (l.category && l.category.toLowerCase().includes(search))
+      );
+    }
+
+    if (igTableCount) igTableCount.textContent = filtered.length;
+    renderInstagramTable(filtered);
+  }
+
+  function renderInstagramTable(leads) {
+    if (!igLeadsTbody) return;
+    if (!leads || leads.length === 0) {
+      igLeadsTbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty-state-cell">
+            <div class="empty-icon">📸</div>
+            <h3 style="color:#fff; font-size:15px; margin-bottom:4px;">No Instagram leads found</h3>
+            <p style="font-size:12px;">Click <strong>"🎲 Generate Random Instagram Leads"</strong> above or add one manually.</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    igLeadsTbody.innerHTML = leads.map(lead => {
+      const cleanHandle = (lead.instagramHandle || lead.businessName || '').replace(/^@/, '');
+      const igProfileUrl = `https://instagram.com/${cleanHandle}`;
+      const igDmUrl = `https://ig.me/m/${cleanHandle}`;
+      const isSent = Boolean(lead.contactedBy || lead.contactStatus === 'Contacted');
+      
+      const phoneValid = lead.phone && lead.phone !== 'DM for Contact' && lead.phone !== 'Not listed';
+
+      return `
+        <tr>
+          <td>
+            <div class="score-badge hot" style="font-size:13px; font-weight:800;">
+              ${lead.leadScore || 88}
+              <span class="score-pill">🔥 Hot</span>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:18px;">📸</span>
+              <div>
+                <div class="lead-name">${escapeHtml(lead.businessName || '@' + cleanHandle)}</div>
+                <a href="${escapeHtml(igProfileUrl)}" target="_blank" rel="noopener noreferrer" style="color:#f43f5e; font-weight:700; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">
+                  @${escapeHtml(cleanHandle)} ↗
+                </a>
+              </div>
+            </div>
+            ${lead.bioSnippet ? `<div style="font-size:11px; color:var(--text-tertiary); margin-top:4px; max-width:220px; line-height:1.3; font-style:italic;">"${escapeHtml(lead.bioSnippet.substring(0, 80))}..."</div>` : ''}
+          </td>
+          <td>
+            <span class="pill-tag" style="background:rgba(225,48,108,0.12); color:#f43f5e; font-weight:700; border:1px solid rgba(225,48,108,0.25);">${escapeHtml(lead.category || 'D2C Brand')}</span>
+            <div class="lead-address" style="margin-top:4px;">📍 ${escapeHtml(lead.city || 'India')}</div>
+          </td>
+          <td>
+            ${phoneValid ? `
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="color:#10b981; font-weight:700; font-size:13px; font-family:var(--font-mono);">${escapeHtml(lead.phone)}</span>
+              </div>
+              <span class="pill-tag" style="font-size:10px; color:#10b981; background:rgba(16,185,129,0.1); margin-top:2px;">WhatsApp Verified</span>
+            ` : `
+              <span class="pill-tag" style="color:#fb7185; background:rgba(244,63,94,0.1);">DM for Contact</span>
+            `}
+          </td>
+          <td>
+            <div style="font-size:12px; color:#fb7185; font-weight:600;">Manual DM / WhatsApp Orders</div>
+            <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">No automated checkout</div>
+          </td>
+          <td>
+            <span class="service-pill" style="border-color:rgba(225,48,108,0.3); color:#fb7185;">${escapeHtml(lead.recommendedService || 'WhatsApp Storefront')}</span>
+          </td>
+          <td>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              ${phoneValid ? `
+                <button class="btn btn-emerald btn-sm btn-ig-send-wa" data-phone="${escapeHtml(lead.phone)}" data-leadid="${escapeHtml(lead.leadId)}" style="padding:4px 10px; font-size:11px;">
+                  💬 WhatsApp Pitch
+                </button>
+              ` : ''}
+              <div style="display:flex; gap:4px;">
+                <a href="${escapeHtml(igDmUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" style="padding:3px 8px; font-size:11px; color:#f43f5e; flex:1; text-align:center; text-decoration:none;">
+                  📱 Open DM
+                </a>
+                <button class="btn btn-secondary btn-sm btn-ig-pitch" data-id="${escapeHtml(lead.leadId)}" style="padding:3px 8px; font-size:11px; flex:1;">
+                  📋 Pitch
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Bind action buttons
+    document.querySelectorAll('.btn-ig-pitch').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const leadId = e.target.getAttribute('data-id');
+        const lead = currentInstagramLeads.find(l => l.leadId === leadId) || currentLeads.find(l => l.leadId === leadId);
+        if (lead) openOutreachModal(lead);
+      });
+    });
+
+    document.querySelectorAll('.btn-ig-send-wa').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const leadId = e.target.getAttribute('data-leadid');
+        const lead = currentInstagramLeads.find(l => l.leadId === leadId);
+        if (!lead) return;
+
+        const memberName = inputMemberName ? inputMemberName.value.trim() : 'Team Member';
+        e.target.disabled = true;
+        e.target.textContent = '⏳ Sending...';
+
+        try {
+          const res = await fetch('/api/whatsapp/send-single', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone: lead.phone,
+              message: lead.outreachMessage,
+              leadId: lead.leadId,
+              memberName
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            e.target.textContent = '✅ Sent!';
+            e.target.style.background = '#10b981';
+            e.target.style.color = '#fff';
+            await fetchStats();
+          } else {
+            alert('Notice: ' + (data.error || 'Failed to send WhatsApp message'));
+            e.target.textContent = '💬 WhatsApp Pitch';
+            e.target.disabled = false;
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+          e.target.textContent = '💬 WhatsApp Pitch';
+          e.target.disabled = false;
+        }
       });
     });
   }
@@ -675,6 +884,94 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 11. Instagram Discovery Event Listeners
+  if (btnGenerateRandomIg) {
+    btnGenerateRandomIg.addEventListener('click', async () => {
+      const count = igBatchSize ? parseInt(igBatchSize.value, 10) : 10;
+      if (igBtnSpinner) igBtnSpinner.classList.remove('hidden');
+      if (igBtnText) igBtnText.textContent = `Generating ${count} Random Leads...`;
+      btnGenerateRandomIg.disabled = true;
+
+      try {
+        const res = await fetch('/api/instagram/generate-random', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ count })
+        });
+        const data = await res.json();
+        if (data.success) {
+          await fetchInstagramLeads();
+          await fetchLeads();
+          await fetchStats();
+        } else {
+          alert('Error: ' + (data.error || 'Failed to generate Instagram leads'));
+        }
+      } catch (err) {
+        alert('Network Error: ' + err.message);
+      } finally {
+        if (igBtnSpinner) igBtnSpinner.classList.add('hidden');
+        if (igBtnText) igBtnText.textContent = '🎲 Generate Random Instagram Leads';
+        btnGenerateRandomIg.disabled = false;
+      }
+    });
+  }
+
+  if (igSearchInput) igSearchInput.addEventListener('input', filterAndRenderInstagramTable);
+  if (igFilterNiche) igFilterNiche.addEventListener('change', filterAndRenderInstagramTable);
+
+  // Manual Modal Listeners
+  if (btnOpenIgManualModal) {
+    btnOpenIgManualModal.addEventListener('click', () => {
+      if (igManualModal) igManualModal.classList.remove('hidden');
+    });
+  }
+
+  if (btnCloseIgManual) {
+    btnCloseIgManual.addEventListener('click', () => {
+      if (igManualModal) igManualModal.classList.add('hidden');
+    });
+  }
+
+  if (btnCancelIgManual) {
+    btnCancelIgManual.addEventListener('click', () => {
+      if (igManualModal) igManualModal.classList.add('hidden');
+    });
+  }
+
+  if (formAddIgManual) {
+    formAddIgManual.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const handle = igManualHandle.value.trim();
+      const businessName = igManualName.value.trim();
+      const category = igManualCategory.value;
+      const city = igManualCity.value.trim();
+      const phone = igManualPhone.value.trim();
+      const bio = igManualBio.value.trim();
+
+      try {
+        const res = await fetch('/api/instagram/manual-add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ handle, businessName, category, city, phone, bio })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (igManualModal) igManualModal.classList.add('hidden');
+          formAddIgManual.reset();
+          await fetchInstagramLeads();
+          await fetchLeads();
+          await fetchStats();
+          // Open pitch modal for newly created lead
+          if (data.lead) openOutreachModal(data.lead);
+        } else {
+          alert('Error: ' + (data.error || 'Failed to add Instagram lead'));
+        }
+      } catch (err) {
+        alert('Network Error: ' + err.message);
+      }
+    });
+  }
+
   // Filter Listeners
   if (searchInput) searchInput.addEventListener('input', fetchLeads);
   if (filterPriority) filterPriority.addEventListener('change', fetchLeads);
@@ -688,6 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial Boot
   fetchStats();
   fetchLeads();
+  fetchInstagramLeads();
   loadQueueData();
   loadSheetsSettings();
   checkWhatsAppStatus();

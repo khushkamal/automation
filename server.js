@@ -11,6 +11,10 @@ import {
   getSearchQueue,
   saveSearchQueue
 } from './auditEngine.js';
+import {
+  generateRandomInstagramLeads,
+  addManualInstagramLead
+} from './instagramDiscovery.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -177,6 +181,40 @@ app.post('/api/run-random-audit', async (req, res) => {
     console.error(`[RANDOM AUDIT ERROR]`, err.message);
     res.status(500).json({ error: err.message });
   }
+});
+
+// 4.2. Instagram Business Lead Discovery Endpoints
+app.post('/api/instagram/generate-random', async (req, res) => {
+  const { count = 10 } = req.body;
+  console.log(`\n==================================================`);
+  console.log(`[INSTAGRAM] Request to generate ${count} random qualified leads`);
+  console.log(`==================================================\n`);
+
+  try {
+    const leads = await generateRandomInstagramLeads(parseInt(count) || 10);
+    res.json({
+      success: true,
+      count: leads.length,
+      leads
+    });
+  } catch (err) {
+    console.error(`[INSTAGRAM DISCOVERY ERROR]`, err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/instagram/manual-add', (req, res) => {
+  try {
+    const lead = addManualInstagramLead(req.body);
+    res.json({ success: true, lead });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/instagram/leads', (req, res) => {
+  const leads = getSavedLeads().filter(l => l.source === 'Instagram Discovery');
+  res.json({ success: true, total: leads.length, leads });
 });
 
 // 5. Run All 'Ready' Queue Items
