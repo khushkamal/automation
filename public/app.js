@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
       topbarTitle.textContent = tabTitles[tabId].title;
       topbarSub.textContent = tabTitles[tabId].sub;
     }
+
+    if (tabId === 'tab-instagram') {
+      fetchInstagramLeads();
+    } else if (tabId === 'tab-leads') {
+      fetchLeads();
+    }
   }
 
   navItems.forEach(item => {
@@ -208,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <tr>
             <td colspan="8" class="empty-state-cell">
               <div class="empty-icon">⚠️</div>
-              <h3 style="color:#fff;">Unable to load leads</h3>
+              <h3 style="color:var(--text-primary);">Unable to load leads</h3>
               <p>${escapeHtml(err.message)}</p>
             </td>
           </tr>
@@ -225,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <tr>
           <td colspan="8" class="empty-state-cell">
             <div class="empty-icon">🔍</div>
-            <h3 style="color:#fff; font-size:15px; margin-bottom:4px;">No qualified leads found</h3>
+            <h3 style="color:var(--text-primary); font-size:15px; margin-bottom:4px;">No qualified leads found</h3>
             <p style="font-size:12px;">Run a search query to discover local businesses or adjust your filters.</p>
           </td>
         </tr>
@@ -372,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <tr>
           <td colspan="7" class="empty-state-cell">
             <div class="empty-icon">📸</div>
-            <h3 style="color:#fff; font-size:15px; margin-bottom:4px;">No Instagram leads found</h3>
+            <h3 style="color:var(--text-primary); font-size:15px; margin-bottom:4px;">No Instagram leads found</h3>
             <p style="font-size:12px;">Click <strong>"🎲 Generate Random Instagram Leads"</strong> above or add one manually.</p>
           </td>
         </tr>
@@ -453,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Bind action buttons
     document.querySelectorAll('.btn-ig-pitch').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const leadId = e.target.getAttribute('data-id');
+        const leadId = e.currentTarget.getAttribute('data-id');
         const lead = currentInstagramLeads.find(l => l.leadId === leadId) || currentLeads.find(l => l.leadId === leadId);
         if (lead) openOutreachModal(lead);
       });
@@ -461,13 +467,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.btn-ig-send-wa').forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        const leadId = e.target.getAttribute('data-leadid');
+        const leadId = e.currentTarget.getAttribute('data-leadid');
         const lead = currentInstagramLeads.find(l => l.leadId === leadId);
         if (!lead) return;
 
         const memberName = inputMemberName ? inputMemberName.value.trim() : 'Team Member';
-        e.target.disabled = true;
-        e.target.textContent = '⏳ Sending...';
+        e.currentTarget.disabled = true;
+        e.currentTarget.textContent = '⏳ Sending...';
 
         try {
           const res = await fetch('/api/whatsapp/send-single', {
@@ -482,19 +488,20 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           const data = await res.json();
           if (data.success) {
-            e.target.textContent = '✅ Sent!';
-            e.target.style.background = '#10b981';
-            e.target.style.color = '#fff';
+            e.currentTarget.textContent = '✅ Sent!';
+            e.currentTarget.style.background = '#10b981';
+            e.currentTarget.style.color = '#fff';
             await fetchStats();
           } else {
-            alert('Notice: ' + (data.error || 'Failed to send WhatsApp message'));
-            e.target.textContent = '💬 WhatsApp Pitch';
-            e.target.disabled = false;
+            // If linked device is not connected, open pitch modal with 1-click wa.me link
+            openOutreachModal(lead);
+            e.currentTarget.textContent = '💬 WhatsApp Pitch';
+            e.currentTarget.disabled = false;
           }
         } catch (err) {
-          alert('Error: ' + err.message);
-          e.target.textContent = '💬 WhatsApp Pitch';
-          e.target.disabled = false;
+          openOutreachModal(lead);
+          e.currentTarget.textContent = '💬 WhatsApp Pitch';
+          e.currentTarget.disabled = false;
         }
       });
     });

@@ -272,18 +272,18 @@ export function generateInstagramPitch({ businessName, handle, category, city, p
   // High-converting Hinglish Pitch for Instagram Sellers
   const outreachMessageHi = `Namaste ${businessName || 'ji'}! 👋 Maine aapka Instagram page dekha (@${cleanHandle}). Aapka ${category || 'collection'} bohot amazing hai! 🔥
 
-Lekin humne notice kiya ki aap orders aur price inquiries DMs aur WhatsApp par manually handle karte hain. Isme ${nicheInfo.painPointHi}.
+Lekin humne notice kiya ki aap orders aur price inquiries DMs aur WhatsApp par manually handle karte hain. Isme dikkat yeh hoti hai ki ${nicheInfo.painPointHi}.
 
-Hum aapke brand ke liye ${nicheInfo.solutionHi}. Isse aapke customers 1-click me catalog dekh kar direct order kar sakenge aur aapka sara time bach jayega.
+Hum aapke brand ke liye ${nicheInfo.solutionHi} setup karte hain. Isse aapke customers 1-click me catalog dekh kar direct order kar sakenge aur aapka bohot saara time bach jayega.
 
 Kya main aapko iska 2-min ka quick demo preview WhatsApp par share kar sakta hu?`;
 
   // High-converting Professional English Pitch
   const outreachMessageEn = `Hi ${businessName || 'Team'}! 👋 Loved your Instagram profile (@${cleanHandle}) and your ${category || 'products'}!
 
-I noticed you manage customer inquiries and orders directly through DMs and WhatsApp. However, ${nicheInfo.painPointEn}.
+I noticed you manage customer inquiries and orders directly through DMs and WhatsApp. However, one key bottleneck is ${nicheInfo.painPointEn}.
 
-We help Instagram brands set up ${nicheInfo.solutionEn}. This eliminates manual "Price Please" chats and allows your followers to order 24/7.
+We help Instagram brands set up ${nicheInfo.solutionEn}. This eliminates manual "Price Please" chats and allows your followers to order 24/7 seamlessly.
 
 Would you be open to a quick 2-minute demo preview customized for your brand?`;
 
