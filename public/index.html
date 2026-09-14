@@ -134,7 +134,7 @@
 
             <div class="form-group">
               <label for="input-city">Target City / Area</label>
-              <input type="text" id="input-city" class="form-control" placeholder="e.g. Mumbai, Delhi, Bangalore, London" required>
+              <input type="text" id="input-city" class="form-control" placeholder="e.g. Mumbai, New York, London, Dubai" required>
             </div>
 
             <div class="form-group">
@@ -142,12 +142,38 @@
               <input type="number" id="input-max" class="form-control" value="20" min="1" max="50">
             </div>
 
-            <div>
-              <button type="submit" id="btn-run-audit" class="btn btn-primary" style="width:100%; height:42px;">
-                <span>🚀 Run Instant Audit</span>
+            <div style="display:flex; gap:8px;">
+              <button type="submit" id="btn-run-audit" class="btn btn-primary" style="height:42px; white-space:nowrap;">
+                <span>🚀 Run Audit</span>
               </button>
             </div>
           </form>
+
+          <!-- Worldwide Random Generator Bar -->
+          <div style="display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">🌍 Worldwide Random Discovery:</span>
+              <select id="select-random-region" class="form-control" style="padding:4px 10px; font-size:12px; font-weight:600; width:auto;">
+                <option value="Worldwide">🌐 All Worldwide (Random)</option>
+                <option value="USA">🇺🇸 USA (New York, LA, Miami...)</option>
+                <option value="UK">🇬🇧 UK (London, Manchester...)</option>
+                <option value="UAE">🇦🇪 UAE (Dubai, Abu Dhabi...)</option>
+                <option value="Canada">🇨🇦 Canada (Toronto, Vancouver...)</option>
+                <option value="Australia">🇦🇺 Australia (Sydney, Melbourne...)</option>
+                <option value="Europe">🇪🇺 Europe (Berlin, Paris, Rome...)</option>
+                <option value="India">🇮🇳 India (Mumbai, Delhi, BLR...)</option>
+              </select>
+            </div>
+
+            <div style="display:flex; gap:8px;">
+              <button type="button" id="btn-roll-random-inputs" class="btn btn-secondary btn-sm">
+                🎲 Pick Random City/Niche
+              </button>
+              <button type="button" id="btn-run-random-worldwide" class="btn btn-emerald btn-sm" style="background:linear-gradient(135deg, #ea580c, #f97316);">
+                ⚡ 1-Click Discover Random Worldwide Leads
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Live Status Banner -->

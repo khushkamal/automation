@@ -308,6 +308,65 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 4.1. Random Worldwide Handlers
+  const selectRandomRegion = document.getElementById('select-random-region');
+  const btnRollRandomInputs = document.getElementById('btn-roll-random-inputs');
+  const btnRunRandomWorldwide = document.getElementById('btn-run-random-worldwide');
+
+  if (btnRollRandomInputs) {
+    btnRollRandomInputs.addEventListener('click', async () => {
+      const region = selectRandomRegion ? selectRandomRegion.value : 'Worldwide';
+      try {
+        const res = await fetch(`/api/random-suggestion?region=${encodeURIComponent(region)}`);
+        const data = await res.json();
+        if (inputKeyword) inputKeyword.value = data.keyword;
+        if (inputCity) inputCity.value = data.city;
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  }
+
+  if (btnRunRandomWorldwide) {
+    btnRunRandomWorldwide.addEventListener('click', async () => {
+      const region = selectRandomRegion ? selectRandomRegion.value : 'Worldwide';
+      btnRunRandomWorldwide.disabled = true;
+
+      if (executionStatus) executionStatus.classList.remove('hidden');
+      if (statusText) statusText.textContent = `Picking random global city in ${region}...`;
+      if (statusDetail) statusDetail.textContent = 'Querying OpenStreetMap and running instant website audits...';
+
+      try {
+        const res = await fetch('/api/run-random-audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ region, maxResults: 15 })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (statusText) statusText.textContent = `Completed! Discovered ${data.totalFoundInOSM || 0} ${data.query.keyword}s in ${data.query.city} (${data.query.region}).`;
+          if (statusDetail) statusDetail.textContent = `Added ${data.qualifiedAdded || 0} qualified worldwide leads.`;
+          if (inputKeyword) inputKeyword.value = data.query.keyword;
+          if (inputCity) inputCity.value = data.query.city;
+          setTimeout(() => {
+            if (executionStatus) executionStatus.classList.add('hidden');
+          }, 4000);
+        } else {
+          if (statusText) statusText.textContent = `Error: ${data.error || 'Failed to complete'}`;
+        }
+
+        await fetchStats();
+        await fetchLeads();
+      } catch (err) {
+        if (statusText) statusText.textContent = 'Network error during random worldwide audit.';
+        console.error(err);
+      } finally {
+        btnRunRandomWorldwide.disabled = false;
+      }
+    });
+  }
+
   // 5. Run Queue
   if (btnRunAllQueue) {
     btnRunAllQueue.addEventListener('click', async () => {

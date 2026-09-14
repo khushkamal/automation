@@ -79,6 +79,51 @@ export function saveSearchQueue(queue) {
   fs.writeFileSync(SEARCH_QUEUE_PATH, JSON.stringify(queue, null, 2));
 }
 
+// Top Worldwide Commercial Cities by Region
+export const GLOBAL_CITIES = {
+  USA: ['New York', 'Los Angeles', 'Chicago', 'Miami', 'Houston', 'San Francisco', 'Austin', 'Seattle', 'Las Vegas', 'Dallas', 'Boston', 'Atlanta'],
+  UK: ['London', 'Manchester', 'Birmingham', 'Edinburgh', 'Leeds', 'Liverpool', 'Bristol', 'Glasgow'],
+  UAE: ['Dubai', 'Abu Dhabi', 'Sharjah', 'Doha', 'Riyadh'],
+  Canada: ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Ottawa'],
+  Australia: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide'],
+  Europe: ['Berlin', 'Paris', 'Amsterdam', 'Dublin', 'Madrid', 'Rome', 'Zurich', 'Vienna'],
+  India: ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune', 'Chennai', 'Kolkata', 'Ahmedabad', 'Jaipur'],
+  Singapore: ['Singapore']
+};
+
+export const GLOBAL_NICHES = [
+  'dentist',
+  'clinic',
+  'restaurant',
+  'salon',
+  'gym',
+  'hotel',
+  'cafe',
+  'physiotherapist',
+  'car_repair',
+  'lawyer',
+  'spa',
+  'veterinary',
+  'bakery',
+  'bar',
+  'dry_cleaning'
+];
+
+export function getRandomGlobalTarget(preferredRegion = 'Worldwide') {
+  let cities = [];
+  if (preferredRegion && preferredRegion !== 'Worldwide' && GLOBAL_CITIES[preferredRegion]) {
+    cities = GLOBAL_CITIES[preferredRegion];
+  } else {
+    // Combine all cities worldwide
+    cities = Object.values(GLOBAL_CITIES).flat();
+  }
+
+  const randomCity = cities[Math.floor(Math.random() * cities.length)];
+  const randomKeyword = GLOBAL_NICHES[Math.floor(Math.random() * GLOBAL_NICHES.length)];
+
+  return { city: randomCity, keyword: randomKeyword, region: preferredRegion };
+}
+
 // 1. Geocode City using Nominatim (with strict 5s timeout)
 async function geocodeCity(city) {
   const controller = new AbortController();

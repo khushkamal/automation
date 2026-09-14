@@ -122,6 +122,63 @@ app.post('/api/run-audit', async (req, res) => {
   }
 });
 
+// 4.1. Run Random Worldwide Audit Endpoint
+import { getRandomGlobalTarget } from './auditEngine.js';
+
+app.get('/api/random-suggestion', (req, res) => {
+  const { region } = req.query;
+  const target = getRandomGlobalTarget(region || 'Worldwide');
+  res.json(target);
+});
+
+app.post('/api/run-random-audit', async (req, res) => {
+  const { region = 'Worldwide', maxResults = 15 } = req.body;
+  const target = getRandomGlobalTarget(region);
+  
+  console.log(`\n==================================================`);
+  console.log(`[RANDOM WORLDWIDE] Picked Target: "${target.keyword}" in "${target.city}" (${target.region})`);
+  console.log(`==================================================\n`);
+
+  try {
+    const rawElements = await searchOverpass(target.keyword, target.city, maxResults);
+    console.log(`[OSM] Discovered ${rawElements.length} businesses in ${target.city}.`);
+    
+    const results = [];
+    let addedCount = 0;
+    let skippedCount = 0;
+
+    for (const elem of rawElements) {
+      const bizName = elem.tags?.name || 'Unnamed Business';
+      const processRes = await processElement(elem, target.keyword, target.city);
+      
+      if (processRes.success) {
+        addedCount++;
+        console.log(`  ✅ [LEAD QUALIFIED] ${bizName} (${target.city}) | Score: ${processRes.lead.leadScore}`);
+      } else {
+        skippedCount++;
+      }
+
+      results.push({
+        elementId: `${elem.type}:${elem.id}`,
+        name: bizName,
+        ...processRes
+      });
+    }
+
+    res.json({
+      success: true,
+      query: { keyword: target.keyword, city: target.city, region: target.region },
+      totalFoundInOSM: rawElements.length,
+      qualifiedAdded: addedCount,
+      skipped: skippedCount,
+      processedResults: results
+    });
+  } catch (err) {
+    console.error(`[RANDOM AUDIT ERROR]`, err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 5. Run All 'Ready' Queue Items
 app.post('/api/run-queue', async (req, res) => {
   const queue = getSearchQueue();
