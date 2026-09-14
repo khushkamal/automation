@@ -57,34 +57,57 @@ function setupSheet() {
   sheet.getRange(1, 1, 1, headers.length)
     .setFontWeight("bold")
     .setBackground("#0f172a")
-    .setFontColor("#38bdf8");
+    .setFontColor("#38bdf8")
+    .setVerticalAlignment("middle");
   sheet.setFrozenRows(1);
+  sheet.setRowHeight(1, 36);
 
   // Set Phone column (Column 6, F) and Lead ID (Column 1, A) to Plain Text format (@)
   sheet.getRange(1, 1, sheet.getMaxRows(), 1).setNumberFormat("@");
   sheet.getRange(1, 6, sheet.getMaxRows(), 1).setNumberFormat("@");
 }
 
-// 1.1 Helper: Fix existing #ERROR! in the current sheet
-function cleanExistingErrors() {
+// 1.1 Helper: Remove All Blank Rows & Fix Spaces / Row Heights (1-Click Clean)
+function cleanAndCompactSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Leads") || ss.getActiveSheet();
   var lastRow = sheet.getLastRow();
-  if (lastRow < 2) return;
-
-  // Format entire Column F (Phone) as Plain Text
-  sheet.getRange(2, 6, lastRow - 1, 1).setNumberFormat("@");
   
-  // Format entire Column A (Lead ID) as Plain Text
-  sheet.getRange(2, 1, lastRow - 1, 1).setNumberFormat("@");
+  if (lastRow > 1) {
+    // 1. Format row height to clean, compact 28px for all rows
+    sheet.setRowHeightsForced(2, lastRow - 1, 28);
+
+    // 2. Set text wrapping to CLIP so long messages don't stretch row height
+    sheet.getRange(2, 1, lastRow - 1, 26)
+      .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+      .setVerticalAlignment("middle")
+      .setFontSize(10);
+
+    // 3. Ensure Phone & Lead ID are plain text (no #ERROR!)
+    sheet.getRange(2, 1, lastRow - 1, 1).setNumberFormat("@");
+    sheet.getRange(2, 6, lastRow - 1, 1).setNumberFormat("@");
+
+    // 4. Delete completely empty rows between data
+    for (var r = lastRow; r >= 2; r--) {
+      var leadIdVal = sheet.getRange(r, 1).getValue();
+      var bizNameVal = sheet.getRange(r, 2).getValue();
+      if (!leadIdVal && !bizNameVal) {
+        sheet.deleteRow(r);
+      }
+    }
+  }
 }
 
-// Helper: Safely insert row as raw text to prevent Google Sheets #ERROR! formula parse
+// Helper: Safely insert row as raw text to prevent Google Sheets #ERROR! formula parse and compact it
 function appendSafeRow(sheet, rowData) {
   var lastRow = sheet.getLastRow() + 1;
-  // Ensure Column 6 (Phone) is text format before writing
   sheet.getRange(lastRow, 6).setNumberFormat("@");
   sheet.getRange(lastRow, 1, 1, rowData.length).setValues([rowData]);
+  sheet.setRowHeight(lastRow, 28);
+  sheet.getRange(lastRow, 1, 1, rowData.length)
+    .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+    .setVerticalAlignment("middle")
+    .setFontSize(10);
 }
 
 // 2. HTTP Webhook Listener: Auto appends leads row-by-row
@@ -106,10 +129,19 @@ function doPost(e) {
     }
     
     if (contents.action === "syncAll" && contents.leads) {
-      var startRow = sheet.getLastRow() + 1;
+      // Clear old rows below header to avoid blank gaps
+      if (sheet.getLastRow() > 1) {
+        sheet.getRange(2, 1, sheet.getLastRow() - 1, 26).clearContent();
+      }
+      
       if (contents.leads.length > 0) {
-        sheet.getRange(startRow, 6, contents.leads.length, 1).setNumberFormat("@");
-        sheet.getRange(startRow, 1, contents.leads.length, contents.leads[0].length).setValues(contents.leads);
+        sheet.getRange(2, 6, contents.leads.length, 1).setNumberFormat("@");
+        sheet.getRange(2, 1, contents.leads.length, contents.leads[0].length).setValues(contents.leads);
+        sheet.setRowHeightsForced(2, contents.leads.length, 28);
+        sheet.getRange(2, 1, contents.leads.length, contents.leads[0].length)
+          .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+          .setVerticalAlignment("middle")
+          .setFontSize(10);
       }
       return ContentService.createTextOutput(JSON.stringify({ status: "success", count: contents.leads.length }))
         .setMimeType(ContentService.MimeType.JSON);
