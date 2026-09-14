@@ -280,6 +280,20 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `<div style="font-size:10px; color:#059669; font-weight:700; margin-top:4px;">✅ Sent by ${escapeHtml(lead.whatsappSentBy || 'Team')}</div>`
         : '';
 
+      const ticketBadge = (lead.ticketSize || lead.purchasingPower) ? `
+        <div style="margin-top:3px;">
+          <span class="pill-tag" style="background:rgba(234,88,12,0.1); color:var(--brand-orange-dark); font-weight:700; font-size:10px; border-color:rgba(234,88,12,0.25);">
+            💎 ${escapeHtml(lead.ticketSize || lead.purchasingPower)}
+          </span>
+        </div>
+      ` : `
+        <div style="margin-top:3px;">
+          <span class="pill-tag" style="background:rgba(234,88,12,0.08); color:var(--brand-orange-dark); font-weight:700; font-size:10px;">
+            💎 High-Ticket Niche
+          </span>
+        </div>
+      `;
+
       return `
         <tr>
           <td>
@@ -290,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             <div class="lead-name">${escapeHtml(lead.businessName || 'Unnamed Business')}</div>
+            ${ticketBadge}
             <div class="lead-address">📍 ${escapeHtml(lead.city || '')} • ${escapeHtml(lead.address || '')}</div>
             ${sentBadge}
           </td>
@@ -548,6 +563,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // 4.0. High-Ticket Niche Preset Click Handlers
+  document.querySelectorAll('.btn-niche-preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const keyword = btn.getAttribute('data-keyword');
+      if (inputKeyword) {
+        inputKeyword.value = keyword;
+        inputKeyword.focus();
+        if (inputCity && !inputCity.value.trim()) {
+          inputCity.value = 'Delhi NCR';
+        }
+      }
+    });
+  });
 
   // 4.1. Random Worldwide Handlers
   const selectRandomRegion = document.getElementById('select-random-region');

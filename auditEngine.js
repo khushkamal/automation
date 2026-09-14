@@ -79,6 +79,117 @@ export function saveSearchQueue(queue) {
   fs.writeFileSync(SEARCH_QUEUE_PATH, JSON.stringify(queue, null, 2));
 }
 
+// High-Budget, High-Ticket Niches with High Purchasing Power & High Lifetime Client Value
+export const HIGH_TICKET_NICHES = [
+  {
+    category: 'Dental & Implant Clinics',
+    keywords: ['dentist', 'dental_clinic', 'orthodontist', 'implant_dentistry'],
+    ticketSize: 'High Ticket (₹20k - ₹1.5L+ per patient)',
+    purchasingPower: 'High Budget',
+    budgetScore: 95
+  },
+  {
+    category: 'Dermatology & Cosmetic Surgery',
+    keywords: ['dermatologist', 'cosmetic_clinic', 'plastic_surgeon', 'hair_transplant', 'aesthetic_clinic'],
+    ticketSize: 'High Ticket (₹25k - ₹2L+ per treatment)',
+    purchasingPower: 'High Budget',
+    budgetScore: 98
+  },
+  {
+    category: 'Real Estate & Luxury Builders',
+    keywords: ['real_estate', 'property_developer', 'real_estate_agency', 'builder', 'realtor'],
+    ticketSize: 'Ultra High Ticket (₹50L - ₹5Cr+ per deal)',
+    purchasingPower: 'High Budget',
+    budgetScore: 99
+  },
+  {
+    category: 'Architects & Luxury Interior Designers',
+    keywords: ['interior_designer', 'architect', 'modular_kitchen', 'architectural_firm'],
+    ticketSize: 'High Ticket (₹2L - ₹25L+ per project)',
+    purchasingPower: 'High Budget',
+    budgetScore: 94
+  },
+  {
+    category: 'Corporate Lawyers & Legal Firms',
+    keywords: ['lawyer', 'law_firm', 'advocate', 'legal_services'],
+    ticketSize: 'High Ticket (₹50k - ₹5L+ retainer)',
+    purchasingPower: 'High Budget',
+    budgetScore: 92
+  },
+  {
+    category: 'Chartered Accountants & Financial Advisors',
+    keywords: ['chartered_accountant', 'tax_consultant', 'wealth_management', 'financial_advisor'],
+    ticketSize: 'High Ticket (₹50k - ₹3L+ annual)',
+    purchasingPower: 'High Budget',
+    budgetScore: 90
+  },
+  {
+    category: 'Luxury Hotels, Resorts & Banquets',
+    keywords: ['hotel', 'resort', 'banquet_hall', 'wedding_venue', 'event_planner'],
+    ticketSize: 'High Ticket (₹1L - ₹10L+ per event)',
+    purchasingPower: 'High Budget',
+    budgetScore: 96
+  },
+  {
+    category: 'Car Detailing & Luxury Auto Studios',
+    keywords: ['car_detailing', 'auto_customization', 'car_dealership', 'car_repair'],
+    ticketSize: 'High Ticket (₹30k - ₹2L+ per vehicle)',
+    purchasingPower: 'High Budget',
+    budgetScore: 91
+  },
+  {
+    category: 'Solar Rooftop & Energy Contractors',
+    keywords: ['solar_installer', 'solar_energy', 'roofing_contractor', 'general_contractor'],
+    ticketSize: 'High Ticket (₹1.5L - ₹15L+ per installation)',
+    purchasingPower: 'High Budget',
+    budgetScore: 93
+  },
+  {
+    category: 'Immigration & Study Abroad Consultants',
+    keywords: ['immigration_consultant', 'study_abroad', 'visa_consultancy'],
+    ticketSize: 'High Ticket (₹50k - ₹3L+ per client)',
+    purchasingPower: 'High Budget',
+    budgetScore: 92
+  },
+  {
+    category: 'Premium Wellness & Luxury Spas',
+    keywords: ['spa', 'wellness_center', 'ayurvedic_resort', 'physiotherapy_center'],
+    ticketSize: 'High Ticket (₹5k - ₹50k+ per package)',
+    purchasingPower: 'High Budget',
+    budgetScore: 88
+  },
+  {
+    category: 'Fine Dining & Gourmet Lounges',
+    keywords: ['fine_dining', 'restaurant', 'lounge', 'brewery'],
+    ticketSize: 'High Volume / High Margin',
+    purchasingPower: 'High Budget',
+    budgetScore: 86
+  }
+];
+
+// Negative Keywords & Low-Profit Micro-Store Exclusions (Filter out small budget shops)
+export const LOW_PROFIT_EXCLUSIONS = [
+  'kirana', 'general store', 'general_store', 'paan', 'pan shop', 'chai', 'tea stall', 'tea_stall',
+  'ration', 'kiosk', 'convenience', 'tobacco', 'newsagent', 'greengrocer', 'butcher',
+  'shoe_repair', 'tailor', 'xerox', 'cyber cafe', 'stationary', 'stationery', 'dairy',
+  'laundry', 'cycle', 'puncture', 'snack_bar', 'dry_cleaning', 'variety store', 'provisions',
+  'sweet shop', 'mithai', 'grocery', 'superette', 'hardware store small', 'bidi', 'pan corner',
+  'small store', 'stall', 'shack', 'booth', 'hawker'
+];
+
+export function isLowProfitMicroBusiness(name, category, tags = {}) {
+  const checkStr = `${name || ''} ${category || ''} ${tags.shop || ''} ${tags.amenity || ''} ${tags.craft || ''}`.toLowerCase();
+  
+  // Exclude unnamed elements
+  if (!name || name === 'Unnamed Business' || name.trim().length < 3) return true;
+  
+  // Exclude micro-store keywords
+  for (const neg of LOW_PROFIT_EXCLUSIONS) {
+    if (checkStr.includes(neg)) return true;
+  }
+  return false;
+}
+
 // Top Worldwide Commercial Cities by Region
 export const GLOBAL_CITIES = {
   USA: ['New York', 'Los Angeles', 'Chicago', 'Miami', 'Houston', 'San Francisco', 'Austin', 'Seattle', 'Las Vegas', 'Dallas', 'Boston', 'Atlanta'],
@@ -87,26 +198,26 @@ export const GLOBAL_CITIES = {
   Canada: ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Ottawa'],
   Australia: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide'],
   Europe: ['Berlin', 'Paris', 'Amsterdam', 'Dublin', 'Madrid', 'Rome', 'Zurich', 'Vienna'],
-  India: ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune', 'Chennai', 'Kolkata', 'Ahmedabad', 'Jaipur'],
+  India: ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune', 'Chennai', 'Kolkata', 'Ahmedabad', 'Jaipur', 'Chandigarh', 'Gurgaon', 'Noida'],
   Singapore: ['Singapore']
 };
 
 export const GLOBAL_NICHES = [
-  'dentist',
-  'clinic',
-  'restaurant',
-  'salon',
-  'gym',
-  'hotel',
-  'cafe',
-  'physiotherapist',
-  'car_repair',
-  'lawyer',
-  'spa',
-  'veterinary',
-  'bakery',
-  'bar',
-  'dry_cleaning'
+  'cosmetic clinic',
+  'dental clinic',
+  'dermatologist',
+  'real estate agency',
+  'interior designer',
+  'architect',
+  'law firm',
+  'chartered accountant',
+  'luxury hotel',
+  'car detailing',
+  'solar installer',
+  'immigration consultant',
+  'wellness spa',
+  'fine dining',
+  'hair transplant'
 ];
 
 export function getRandomGlobalTarget(preferredRegion = 'Worldwide') {
@@ -114,7 +225,6 @@ export function getRandomGlobalTarget(preferredRegion = 'Worldwide') {
   if (preferredRegion && preferredRegion !== 'Worldwide' && GLOBAL_CITIES[preferredRegion]) {
     cities = GLOBAL_CITIES[preferredRegion];
   } else {
-    // Combine all cities worldwide
     cities = Object.values(GLOBAL_CITIES).flat();
   }
 
@@ -147,34 +257,128 @@ async function geocodeCity(city) {
   return null;
 }
 
+// Map user-friendly high ticket search queries to exact OpenStreetMap tags & filters
+export function getOsmTagFilters(keyword) {
+  const kw = (keyword || '').toLowerCase().trim();
+  
+  if (kw.includes('cosmetic') || kw.includes('dermatolog') || kw.includes('skin') || kw.includes('aesthetic') || kw.includes('hair transplant')) {
+    return [
+      '["amenity"="clinic"]',
+      '["healthcare"="clinic"]',
+      '["healthcare"="doctor"]',
+      '["healthcare"="dermatologist"]',
+      '["name"~"clinic|skin|cosmetic|laser|aesthetic|derma",i]'
+    ];
+  }
+  if (kw.includes('dent') || kw.includes('implant') || kw.includes('orthodont')) {
+    return [
+      '["amenity"="dentist"]',
+      '["healthcare"="dentist"]',
+      '["name"~"dental|dentist|implant|smile|orthodont",i]'
+    ];
+  }
+  if (kw.includes('real estate') || kw.includes('builder') || kw.includes('realtor') || kw.includes('property')) {
+    return [
+      '["office"="estate_agent"]',
+      '["office"="property_management"]',
+      '["name"~"realty|real estate|properties|developer|infra|builder",i]'
+    ];
+  }
+  if (kw.includes('interior') || kw.includes('architect')) {
+    return [
+      '["office"="architect"]',
+      '["office"="interior_decorator"]',
+      '["craft"="interior_work"]',
+      '["name"~"architect|interior|designer|studio|decor",i]'
+    ];
+  }
+  if (kw.includes('law') || kw.includes('legal') || kw.includes('advocate') || kw.includes('attorney')) {
+    return [
+      '["office"="lawyer"]',
+      '["office"="legal"]',
+      '["name"~"law|legal|advocate|attorney|associates",i]'
+    ];
+  }
+  if (kw.includes('ca') || kw.includes('account') || kw.includes('tax') || kw.includes('audit')) {
+    return [
+      '["office"="accountant"]',
+      '["office"="tax_advisor"]',
+      '["office"="financial_advisor"]',
+      '["name"~"chartered|accountant|tax|audit|consulting",i]'
+    ];
+  }
+  if (kw.includes('hotel') || kw.includes('resort') || kw.includes('banquet') || kw.includes('wedding')) {
+    return [
+      '["tourism"="hotel"]',
+      '["tourism"="resort"]',
+      '["amenity"="events_venue"]',
+      '["name"~"hotel|resort|banquet|palace|suites",i]'
+    ];
+  }
+  if (kw.includes('car') || kw.includes('auto') || kw.includes('detailing')) {
+    return [
+      '["shop"="car_repair"]',
+      '["shop"="car"]',
+      '["name"~"detailing|motors|auto|custom|garage|service",i]'
+    ];
+  }
+  if (kw.includes('solar') || kw.includes('energy')) {
+    return [
+      '["office"="energy_supplier"]',
+      '["craft"="electrician"]',
+      '["name"~"solar|energy|renewable|power",i]'
+    ];
+  }
+  if (kw.includes('spa') || kw.includes('wellness')) {
+    return [
+      '["amenity"="spa"]',
+      '["leisure"="spa"]',
+      '["name"~"spa|wellness|ayurveda|rejuvenation",i]'
+    ];
+  }
+  if (kw.includes('visa') || kw.includes('immigrat') || kw.includes('study abroad')) {
+    return [
+      '["office"="educational_institution"]',
+      '["office"="consulting"]',
+      '["name"~"immigration|visa|study abroad|overseas|consultancy",i]'
+    ];
+  }
+
+  // Fallback single-word token matching
+  const token = kw.split(/\s+/)[0];
+  return [
+    `["amenity"~"${token}",i]`,
+    `["office"~"${token}",i]`,
+    `["healthcare"~"${token}",i]`,
+    `["shop"~"${token}",i]`,
+    `["tourism"~"${token}",i]`,
+    `["name"~"${token}",i]`
+  ];
+}
+
 // 2. Fetch businesses from OpenStreetMap Overpass API
 export async function searchOverpass(keyword, city, maxResults = 20) {
-  const cleanKeyword = keyword.toLowerCase().trim();
-  const cleanCity = city.trim();
+  const cleanKeyword = (keyword || '').toLowerCase().trim();
+  const cleanCity = (city || '').trim();
 
   // Try fast Geocoding first
   const bbox = await geocodeCity(cleanCity);
+  const tagFilters = getOsmTagFilters(cleanKeyword);
   
   let overpassQuery = '';
   if (bbox) {
+    const filterClauses = tagFilters.map(f => `  nwr${f}(${bbox.south},${bbox.west},${bbox.north},${bbox.east});`).join('\n');
     overpassQuery = `[out:json][timeout:15];
 (
-  nwr["amenity"~"${cleanKeyword}",i](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
-  nwr["healthcare"~"${cleanKeyword}",i](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
-  nwr["shop"~"${cleanKeyword}",i](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
-  nwr["leisure"~"${cleanKeyword}",i](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
-  nwr["office"~"${cleanKeyword}",i](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
-  nwr["tourism"~"${cleanKeyword}",i](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
+${filterClauses}
 );
 out center ${maxResults};`;
   } else {
+    const filterClauses = tagFilters.map(f => `  nwr${f}(area.searchArea);`).join('\n');
     overpassQuery = `[out:json][timeout:15];
 area["name"~"${cleanCity}",i]->.searchArea;
 (
-  nwr["amenity"~"${cleanKeyword}",i](area.searchArea);
-  nwr["shop"~"${cleanKeyword}",i](area.searchArea);
-  nwr["healthcare"~"${cleanKeyword}",i](area.searchArea);
-  nwr["office"~"${cleanKeyword}",i](area.searchArea);
+${filterClauses}
 );
 out center ${maxResults};`;
   }
@@ -383,6 +587,25 @@ export async function processElement(elem, queueKeyword, queueCity) {
   const businessName = tags.name || 'Unnamed Business';
   const category = tags.amenity || tags.shop || tags.healthcare || tags.office || queueKeyword || 'Business';
   const city = tags['addr:city'] || queueCity || 'Unknown City';
+
+  // 1. Strict High-Budget Filter: Discard small micro-stores / low-profit shops
+  if (isLowProfitMicroBusiness(businessName, category, tags)) {
+    return { 
+      skipped: true, 
+      reason: `Filtered: Low-profit micro store / small retailer with low budget capacity (${businessName})`, 
+      leadId 
+    };
+  }
+
+  // 2. High-Ticket Niche Classification & Purchasing Power
+  const nicheMatch = HIGH_TICKET_NICHES.find(n => 
+    n.keywords.some(k => category.toLowerCase().includes(k) || (queueKeyword || '').toLowerCase().includes(k)) ||
+    n.category.toLowerCase().includes(category.toLowerCase())
+  );
+
+  const purchasingPower = nicheMatch ? nicheMatch.purchasingPower : 'High Budget';
+  const ticketSize = nicheMatch ? nicheMatch.ticketSize : 'High-Ticket B2B / Premium B2C';
+  const budgetBonus = nicheMatch ? 10 : 0;
   
   const addressParts = [
     tags['addr:housename'],
@@ -401,8 +624,8 @@ export async function processElement(elem, queueKeyword, queueCity) {
 
   // ROUTE A: No Website
   const isIndia = isIndianLocation(city, phone);
-  const outreachMessageEnNoWeb = `Hi ${businessName || 'Business Owner'}, noticed your ${category} in ${city} does not have an active website. 80% of local customers search online before visiting. We help local businesses build high-converting websites to generate daily calls and appointments. Would you be open for a quick demo?`;
-  const outreachMessageHiNoWeb = `Namaste ${businessName || 'Sir/Ma\'am'}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal 80% clients pehle Google pe search karte hain. Hum aapke business ke liye ek professional website & WhatsApp inquiry system bana sakte hain. Kya hum 5-min discuss kar sakte hain?`;
+  const outreachMessageEnNoWeb = `Hi ${businessName || 'Team'}, noticed your ${category} practice in ${city} does not have an active website. High-intent clients actively search Google before booking high-value services. We build high-converting websites with instant appointment booking & WhatsApp inquiry funnels. Would you be open for a quick 2-min preview?`;
+  const outreachMessageHiNoWeb = `Namaste ${businessName || 'Sir/Ma\'am'}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal high-value clients aur patients pehle Google pe verify karke hi appointment book karte hain. Hum aapke business ke liye ek premium website & instant WhatsApp booking system setup kar sakte hain. Kya hum ispar 2-min discuss kar sakte hain?`;
 
   if (!websiteUrl) {
     leadRecord = {
@@ -424,11 +647,13 @@ export async function processElement(elem, queueKeyword, queueCity) {
       onlineBooking: 'Not visible',
       adsStatus: 'Unknown',
       automationStatus: 'High Opportunity',
-      aiOpportunity: 'Rule-based audit; no AI API used',
-      leadScore: 85,
+      aiOpportunity: 'High-Ticket Web & WhatsApp Funnel Setup',
+      leadScore: Math.min(100, 85 + budgetBonus),
       leadPriority: 'Hot',
+      purchasingPower,
+      ticketSize,
       recommendedService: 'Website Development',
-      auditReason: 'Business has no publicly listed website',
+      auditReason: 'High-ticket business has no active website (losing clients to competitors)',
       outreachMessage: isIndia ? outreachMessageHiNoWeb : outreachMessageEnNoWeb,
       outreachMessageEn: outreachMessageEnNoWeb,
       outreachMessageHi: outreachMessageHiNoWeb,
@@ -441,7 +666,7 @@ export async function processElement(elem, queueKeyword, queueCity) {
     const fetchRes = await fetchWebsite(websiteUrl);
     
     if (!fetchRes.ok) {
-      const brokenEn = `Hi ${businessName}, we noticed your website ${websiteUrl} seems to be down or inaccessible. Having an active site is critical for your ${category} in ${city}. Can we help you restore it?`;
+      const brokenEn = `Hi ${businessName}, we noticed your website ${websiteUrl} seems to be down or inaccessible. Having an active site is critical for your ${category} practice in ${city}. Can we help you restore it?`;
       const brokenHi = `Namaste ${businessName}, maine dekha ki aapki website ${websiteUrl} open nahi ho rahi hai. ${city} me aapke ${category} business ke liye active website hona bohot zaroori hai. Kya hum ise restore karne me help karein?`;
 
       leadRecord = {
@@ -463,9 +688,11 @@ export async function processElement(elem, queueKeyword, queueCity) {
         onlineBooking: 'Unknown',
         adsStatus: 'Unknown / Not publicly verifiable',
         automationStatus: 'High Opportunity',
-        aiOpportunity: 'Rule-based audit; no AI API used',
-        leadScore: 65,
+        aiOpportunity: 'Website Recovery & Funnel Rebuild',
+        leadScore: Math.min(100, 65 + budgetBonus),
         leadPriority: 'Warm',
+        purchasingPower,
+        ticketSize,
         recommendedService: 'Website Redesign',
         auditReason: 'Website could not be fetched for automated inspection (Server down / SSL broken)',
         outreachMessage: isIndia ? brokenHi : brokenEn,
@@ -478,9 +705,10 @@ export async function processElement(elem, queueKeyword, queueCity) {
     } else {
       const audit = auditWebsiteHtml(fetchRes.html, fetchRes.url, businessName, category, city, phone);
       
+      const finalScore = Math.min(100, audit.calculatedScore + budgetBonus);
       // Filter: Only leads with score >= 40
-      if (audit.calculatedScore < 40) {
-        return { skipped: true, reason: 'Lead score below qualification threshold (< 40)', leadId, score: audit.calculatedScore };
+      if (finalScore < 40) {
+        return { skipped: true, reason: 'Lead score below qualification threshold (< 40)', leadId, score: finalScore };
       }
 
       leadRecord = {
@@ -502,9 +730,11 @@ export async function processElement(elem, queueKeyword, queueCity) {
         onlineBooking: audit.hasBooking,
         adsStatus: audit.hasTracking,
         automationStatus: audit.automationStatus,
-        aiOpportunity: 'Rule-based audit; no AI API used',
-        leadScore: audit.calculatedScore,
-        leadPriority: audit.leadPriority,
+        aiOpportunity: 'High-Ticket Conversion Optimization & Booking System',
+        leadScore: finalScore,
+        leadPriority: finalScore >= 80 ? 'Hot' : (finalScore >= 60 ? 'Warm' : 'Potential'),
+        purchasingPower,
+        ticketSize,
         recommendedService: audit.recommendedService,
         auditReason: audit.auditReason,
         outreachMessage: audit.outreachMessage,

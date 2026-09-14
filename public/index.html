@@ -155,15 +155,40 @@
 
         <!-- Search Discovery Panel -->
         <div class="search-card">
+          <!-- High-Ticket Budget Filter Bar -->
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(234,88,12,0.1); border:1px solid rgba(234,88,12,0.25); border-radius:20px; padding:3px 10px;">
+              <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">💎 High-Ticket Profitable Niches:</span>
+              <span style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">High Purchasing Power</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-tertiary); font-weight:600;">
+              🛡️ Low-profit kirana/micro-shops are automatically filtered out
+            </div>
+          </div>
+
+          <!-- 1-Click High-Ticket Presets -->
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;" id="high-ticket-presets">
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="cosmetic clinic" style="font-size:11px; padding:4px 9px;">🏥 Cosmetic / Dermatology</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="dental clinic" style="font-size:11px; padding:4px 9px;">🦷 Dental & Implants</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="real estate agency" style="font-size:11px; padding:4px 9px;">🏢 Real Estate & Builders</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="interior designer" style="font-size:11px; padding:4px 9px;">🛋️ Interior Designers</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="law firm" style="font-size:11px; padding:4px 9px;">⚖️ Law & Legal Firms</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="chartered accountant" style="font-size:11px; padding:4px 9px;">📊 CA & Tax Advisory</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="luxury hotel" style="font-size:11px; padding:4px 9px;">🏨 Luxury Hotels & Resorts</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="car detailing" style="font-size:11px; padding:4px 9px;">🚗 Car Detailing Studios</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="solar installer" style="font-size:11px; padding:4px 9px;">☀️ Solar Contractors</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="immigration consultant" style="font-size:11px; padding:4px 9px;">✈️ Study Abroad / Visa</button>
+          </div>
+
           <form id="quick-run-form" class="search-form">
             <div class="form-group">
-              <label for="input-keyword">Category / Keyword (OSM Tag)</label>
-              <input type="text" id="input-keyword" class="form-control" placeholder="e.g. dentist, salon, restaurant, gym, clinic, hotel" required>
+              <label for="input-keyword">High-Ticket Niche / Category</label>
+              <input type="text" id="input-keyword" class="form-control" placeholder="e.g. cosmetic clinic, dental clinic, real estate, interior designer" required>
             </div>
 
             <div class="form-group">
               <label for="input-city">Target City / Area</label>
-              <input type="text" id="input-city" class="form-control" placeholder="e.g. Mumbai, New York, London, Dubai" required>
+              <input type="text" id="input-city" class="form-control" placeholder="e.g. Mumbai, Delhi NCR, Bangalore, Dubai, London" required>
             </div>
 
             <div class="form-group">
@@ -181,7 +206,7 @@
           <!-- Worldwide Random Generator Bar -->
           <div style="display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">🌍 Worldwide Random Discovery:</span>
+              <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">🌍 Worldwide High-Ticket Discovery:</span>
               <select id="select-random-region" class="form-control" style="padding:4px 10px; font-size:12px; font-weight:600; width:auto;">
                 <option value="Worldwide">🌐 All Worldwide (Random)</option>
                 <option value="USA">🇺🇸 USA (New York, LA, Miami...)</option>
@@ -196,10 +221,10 @@
 
             <div style="display:flex; gap:8px;">
               <button type="button" id="btn-roll-random-inputs" class="btn btn-secondary btn-sm">
-                🎲 Pick Random City/Niche
+                🎲 Pick High-Ticket City/Niche
               </button>
               <button type="button" id="btn-run-random-worldwide" class="btn btn-emerald btn-sm" style="background:linear-gradient(135deg, #ea580c, #f97316);">
-                ⚡ 1-Click Discover Random Worldwide Leads
+                ⚡ 1-Click Discover High-Budget Leads
               </button>
             </div>
           </div>
@@ -209,8 +234,8 @@
         <div id="execution-status" class="status-banner hidden">
           <div class="spinner"></div>
           <div>
-            <div style="font-weight:600; font-size:13px; color:#60a5fa;" id="status-text">Querying OpenStreetMap...</div>
-            <div style="font-size:12px; color:var(--text-secondary);" id="status-detail">Please wait while businesses are discovered and audited.</div>
+            <div style="font-weight:600; font-size:13px; color:#60a5fa;" id="status-text">Querying OpenStreetMap for High-Ticket Businesses...</div>
+            <div style="font-size:12px; color:var(--text-secondary);" id="status-detail">Filtering small micro-stores and auditing website inspection signals...</div>
           </div>
         </div>
 
@@ -218,7 +243,7 @@
         <div class="table-card">
           <div class="table-toolbar">
             <div class="filter-group">
-              <input type="text" id="search-input" class="form-control filter-input" placeholder="Search by name, city, phone...">
+              <input type="text" id="search-input" class="form-control filter-input" placeholder="Search by name, city, phone, category...">
               <select id="filter-priority" class="form-control">
                 <option value="All">All Priorities</option>
                 <option value="Hot">🔥 Hot (Score 80-100)</option>
@@ -241,7 +266,7 @@
               <thead>
                 <tr>
                   <th>Score</th>
-                  <th>Business & Location</th>
+                  <th>Business & Purchasing Power</th>
                   <th>Category</th>
                   <th>Phone Number</th>
                   <th>Website & Signals</th>
@@ -254,8 +279,8 @@
                 <tr>
                   <td colspan="8" class="empty-state-cell">
                     <div class="empty-icon">🔍</div>
-                    <h3 style="color:#fff; font-size:15px; margin-bottom:4px;">No qualified leads generated yet</h3>
-                    <p style="font-size:12px;">Run a search above or start your queue to discover local businesses.</p>
+                    <h3 style="color:var(--text-primary); font-size:15px; margin-bottom:4px;">No qualified leads generated yet</h3>
+                    <p style="font-size:12px;">Select a high-ticket niche above or run a search to discover high-value businesses.</p>
                   </td>
                 </tr>
               </tbody>
