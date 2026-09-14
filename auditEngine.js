@@ -254,8 +254,34 @@ export async function fetchWebsite(url) {
   }
 }
 
+// Indian Cities list for language auto-detection
+const INDIAN_CITIES_SET = new Set([
+  'mumbai', 'delhi', 'bangalore', 'bengaluru', 'hyderabad', 'pune', 'chennai', 'kolkata',
+  'ahmedabad', 'jaipur', 'surat', 'lucknow', 'kanpur', 'nagpur', 'indore', 'thane', 'bhopal',
+  'visakhapatnam', 'patna', 'vadodara', 'ghaziabad', 'ludhiana', 'agra', 'nashik', 'faridabad',
+  'meerut', 'rajkot', 'varanasi', 'srinagar', 'aurangabad', 'dhanbad', 'amritsar', 'navi mumbai',
+  'allahabad', 'prayagraj', 'ranchi', 'howrah', 'coimbatore', 'jabalpur', 'gwalior', 'vijayawada',
+  'jodhpur', 'madurai', 'raipur', 'kota', 'chandigarh', 'guwahati', 'solapur', 'hubli', 'mysore',
+  'gurgaon', 'gurugram', 'noida', 'dehradun', 'mundara'
+]);
+
+export function isIndianLocation(city, phone) {
+  const cleanCity = (city || '').toLowerCase().trim();
+  const cleanPhone = (phone || '').replace(/[^0-9]/g, '');
+
+  if (INDIAN_CITIES_SET.has(cleanCity)) return true;
+  if (cleanPhone.startsWith('91') && cleanPhone.length === 12) return true;
+  if (cleanPhone.length === 10) return true; // Standard 10 digit Indian number
+  
+  // Check if city matches any Indian state/region
+  for (const c of INDIAN_CITIES_SET) {
+    if (cleanCity.includes(c)) return true;
+  }
+  return false;
+}
+
 // 4. Rule-Based Website Audit Engine (No AI API, 100% Deterministic)
-export function auditWebsiteHtml(html, siteUrl, businessName, category, city) {
+export function auditWebsiteHtml(html, siteUrl, businessName, category, city, phone) {
   const lowerHtml = (html || '').toLowerCase();
   
   const isHttps = siteUrl.toLowerCase().startsWith('https://') || lowerHtml.includes('https://') ? 'Yes' : 'No';
@@ -301,19 +327,25 @@ export function auditWebsiteHtml(html, siteUrl, businessName, category, city) {
     missingFeaturesHi.push('mobile-friendly design');
   }
   if (hasWhatsApp === 'Not detected') {
-    missingFeaturesEn.push('1-click WhatsApp customer chat');
+    missingFeaturesEn.push('1-click customer chat');
     missingFeaturesHi.push('direct WhatsApp customer chat button');
   }
   if (hasBooking === 'Not detected') {
-    missingFeaturesEn.push('direct appointment booking');
+    missingFeaturesEn.push('online appointment booking');
     missingFeaturesHi.push('online appointment booking system');
   }
   
-  const featureListEn = missingFeaturesEn.length > 0 ? missingFeaturesEn.join(' and ') : 'modern design upgrades';
+  const featureListEn = missingFeaturesEn.length > 0 ? missingFeaturesEn.join(' and ') : 'modern UI design upgrades';
   const featureListHi = missingFeaturesHi.length > 0 ? missingFeaturesHi.join(' aur ') : 'website upgrades';
 
-  // Default to friendly Hinglish (highest conversion for Indian local businesses) with English fallback
-  const outreachMessage = `Namaste ${businessName || 'Sir/Ma\'am'}, maine aapka ${category} business ${city} me review kiya. Aapki website ${siteUrl} par agar ${featureListHi} add karein toh aapko local clients se daily 2x se 3x zyada inquiries & bookings mil sakti hain. Hum ise 2 din me set up kar sakte hain. Kya hum ispar 5-min discuss kar sakte hain?`;
+  const isIndia = isIndianLocation(city, phone);
+
+  // High-converting messages
+  const outreachMessageEn = `Hi ${businessName || 'Business Owner'}, I reviewed ${siteUrl} for your ${category} in ${city} and noticed you could attract significantly more clients by adding ${featureListEn}. We specialize in setting this up for local businesses. Would you be open to a quick 5-min demo?`;
+  const outreachMessageHi = `Namaste ${businessName || 'Sir/Ma\'am'}, maine aapka ${category} business ${city} me review kiya. Aapki website ${siteUrl} par agar ${featureListHi} add karein toh aapko local clients se daily 2x se 3x zyada inquiries mil sakti hain. Kya hum ispar 5-min discuss kar sakte hain?`;
+
+  // Auto-assign: If international -> Professional English, If India -> Hinglish
+  const outreachMessage = isIndia ? outreachMessageHi : outreachMessageEn;
 
   return {
     isHttps,
@@ -328,7 +360,9 @@ export function auditWebsiteHtml(html, siteUrl, businessName, category, city) {
     recommendedService,
     auditReason,
     outreachMessage,
-    outreachMessageEn: `Hi ${businessName || 'Business Owner'}, I checked ${siteUrl} for your ${category} in ${city} and noticed you could attract significantly more clients by adding ${featureListEn}. We can set this up quickly for you. Would you be open to a quick 5-min demo?`,
+    outreachMessageEn,
+    outreachMessageHi,
+    isInternational: !isIndia,
     websiteQuality: score > 60 ? 'Needs Improvement' : 'Fair',
     automationStatus: score >= 60 ? 'High Opportunity' : 'Moderate Opportunity'
   };
@@ -366,6 +400,10 @@ export async function processElement(elem, queueKeyword, queueCity) {
   let leadRecord = null;
 
   // ROUTE A: No Website
+  const isIndia = isIndianLocation(city, phone);
+  const outreachMessageEnNoWeb = `Hi ${businessName || 'Business Owner'}, noticed your ${category} in ${city} does not have an active website. 80% of local customers search online before visiting. We help local businesses build high-converting websites to generate daily calls and appointments. Would you be open for a quick demo?`;
+  const outreachMessageHiNoWeb = `Namaste ${businessName || 'Sir/Ma\'am'}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal 80% clients pehle Google pe search karte hain. Hum aapke business ke liye ek professional website & WhatsApp inquiry system bana sakte hain. Kya hum 5-min discuss kar sakte hain?`;
+
   if (!websiteUrl) {
     leadRecord = {
       leadId,
@@ -391,8 +429,10 @@ export async function processElement(elem, queueKeyword, queueCity) {
       leadPriority: 'Hot',
       recommendedService: 'Website Development',
       auditReason: 'Business has no publicly listed website',
-      outreachMessage: `Namaste ${businessName || 'Sir/Ma\'am'}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal 80% clients pehle Google pe search karte hain. Hum aapke business ke liye ek professional website & WhatsApp inquiry system bana sakte hain. Kya hum 5-min discuss kar sakte hain?`,
-      outreachMessageEn: `Hi ${businessName}, noticed your ${category} in ${city} does not have an active website. We help local businesses build high-converting websites to generate daily inquiries. Would you be open for a quick demo?`,
+      outreachMessage: isIndia ? outreachMessageHiNoWeb : outreachMessageEnNoWeb,
+      outreachMessageEn: outreachMessageEnNoWeb,
+      outreachMessageHi: outreachMessageHiNoWeb,
+      isInternational: !isIndia,
       source: 'OpenStreetMap / Overpass',
       dateAdded: now
     };
@@ -401,6 +441,9 @@ export async function processElement(elem, queueKeyword, queueCity) {
     const fetchRes = await fetchWebsite(websiteUrl);
     
     if (!fetchRes.ok) {
+      const brokenEn = `Hi ${businessName}, we noticed your website ${websiteUrl} seems to be down or inaccessible. Having an active site is critical for your ${category} in ${city}. Can we help you restore it?`;
+      const brokenHi = `Namaste ${businessName}, maine dekha ki aapki website ${websiteUrl} open nahi ho rahi hai. ${city} me aapke ${category} business ke liye active website hona bohot zaroori hai. Kya hum ise restore karne me help karein?`;
+
       leadRecord = {
         leadId,
         businessName,
@@ -425,12 +468,15 @@ export async function processElement(elem, queueKeyword, queueCity) {
         leadPriority: 'Warm',
         recommendedService: 'Website Redesign',
         auditReason: 'Website could not be fetched for automated inspection (Server down / SSL broken)',
-        outreachMessage: `Hi ${businessName}, we noticed your website ${websiteUrl} seems to be down or inaccessible. Having an active site is critical for your ${category} in ${city}. Can we help you restore it?`,
+        outreachMessage: isIndia ? brokenHi : brokenEn,
+        outreachMessageEn: brokenEn,
+        outreachMessageHi: brokenHi,
+        isInternational: !isIndia,
         source: 'OpenStreetMap / Overpass',
         dateAdded: now
       };
     } else {
-      const audit = auditWebsiteHtml(fetchRes.html, fetchRes.url, businessName, category, city);
+      const audit = auditWebsiteHtml(fetchRes.html, fetchRes.url, businessName, category, city, phone);
       
       // Filter: Only leads with score >= 40
       if (audit.calculatedScore < 40) {
@@ -462,6 +508,9 @@ export async function processElement(elem, queueKeyword, queueCity) {
         recommendedService: audit.recommendedService,
         auditReason: audit.auditReason,
         outreachMessage: audit.outreachMessage,
+        outreachMessageEn: audit.outreachMessageEn,
+        outreachMessageHi: audit.outreachMessageHi,
+        isInternational: audit.isInternational,
         source: 'OpenStreetMap / Overpass',
         dateAdded: now
       };

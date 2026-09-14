@@ -485,15 +485,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function openOutreachModal(lead) {
     activeModalLead = lead;
     if (!outreachLeadInfo || !outreachText || !outreachModal) return;
+    
+    const countryFlag = lead.isInternational ? '🌍 International Client' : '🇮🇳 Indian Client';
+    
     outreachLeadInfo.innerHTML = `
       <div>
-        <h4 style="color:#fff; font-size:16px; font-weight:700;">${escapeHtml(lead.businessName || 'Business')}</h4>
-        <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${escapeHtml(lead.category || '')} in ${escapeHtml(lead.city || '')} • Recommended Service: <strong style="color:#60a5fa">${escapeHtml(lead.recommendedService || '')}</strong></p>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h4 style="color:var(--text-primary); font-size:16px; font-weight:800;">${escapeHtml(lead.businessName || 'Business')}</h4>
+          <span class="pill-tag" style="font-size:10px; font-weight:700;">${countryFlag}</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-top:2px;">${escapeHtml(lead.category || '')} in ${escapeHtml(lead.city || '')} • Recommended Service: <strong style="color:var(--brand-orange-dark)">${escapeHtml(lead.recommendedService || '')}</strong></p>
       </div>
     `;
     
-    // Default to Hinglish
-    updatePitchLanguage('hi');
+    // Auto-detect default language: English for international, Hinglish for India
+    const defaultLang = lead.isInternational ? 'en' : 'hi';
+    updatePitchLanguage(defaultLang);
 
     outreachModal.classList.remove('hidden');
   }
