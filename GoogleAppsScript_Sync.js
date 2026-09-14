@@ -59,6 +59,24 @@ function setupSheet() {
     .setBackground("#0f172a")
     .setFontColor("#38bdf8");
   sheet.setFrozenRows(1);
+
+  // Set Phone column (Column 6) and Lead ID (Column 1) to Plain Text to avoid formula #ERROR!
+  sheet.getRange(1, 1, sheet.getMaxRows(), 1).setNumberFormat("@");
+  sheet.getRange(1, 6, sheet.getMaxRows(), 1).setNumberFormat("@");
+}
+
+// Helper: Sanitize row to prevent Google Sheets from interpreting '+' or '=' as mathematical formulas
+function sanitizeRow(row) {
+  if (!row || !Array.isArray(row)) return [];
+  return row.map(function(val) {
+    if (val === null || val === undefined) return "";
+    var s = String(val).trim();
+    // If starts with '+' or '=', force Google Sheets plain text with leading quote
+    if (s.charAt(0) === "+" || s.charAt(0) === "=") {
+      return "'" + s;
+    }
+    return val;
+  });
 }
 
 // 2. HTTP Webhook Listener: Auto appends leads row-by-row
@@ -74,14 +92,16 @@ function doPost(e) {
     }
     
     if (contents.action === "addLead" && contents.lead) {
-      sheet.appendRow(contents.lead);
+      var cleanRow = sanitizeRow(contents.lead);
+      sheet.appendRow(cleanRow);
       return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Lead added" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
     
     if (contents.action === "syncAll" && contents.leads) {
       for (var i = 0; i < contents.leads.length; i++) {
-        sheet.appendRow(contents.leads[i]);
+        var cleanRow = sanitizeRow(contents.leads[i]);
+        sheet.appendRow(cleanRow);
       }
       return ContentService.createTextOutput(JSON.stringify({ status: "success", count: contents.leads.length }))
         .setMimeType(ContentService.MimeType.JSON);

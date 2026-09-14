@@ -33,34 +33,43 @@ export async function syncLeadToGoogleSheet(lead) {
     return { synced: false, reason: 'Google Sheet Webhook URL not configured' };
   }
 
-  // Exact 26 column row array
+  const sanitize = (val) => {
+    if (val === null || val === undefined) return '';
+    const s = String(val).trim();
+    if (s.startsWith('+') || s.startsWith('=')) {
+      return "'" + s;
+    }
+    return s;
+  };
+
+  // Exact 26 column row array (sanitized to prevent formula parse error)
   const rowData = [
-    lead.leadId,
-    lead.businessName,
-    lead.category,
-    lead.city,
-    lead.address,
-    lead.phone,
-    lead.website,
-    lead.googleMapsUrl,
-    lead.rating,
-    lead.reviews,
-    lead.websiteStatus,
-    lead.websiteQuality,
-    lead.mobileFriendly,
-    lead.cta,
-    lead.whatsApp,
-    lead.onlineBooking,
-    lead.adsStatus,
-    lead.automationStatus,
-    lead.aiOpportunity,
-    lead.leadScore,
-    lead.leadPriority,
-    lead.recommendedService,
-    lead.auditReason,
-    lead.outreachMessage,
-    lead.source,
-    lead.dateAdded
+    sanitize(lead.leadId),
+    sanitize(lead.businessName),
+    sanitize(lead.category),
+    sanitize(lead.city),
+    sanitize(lead.address),
+    sanitize(lead.phone),
+    sanitize(lead.website),
+    sanitize(lead.googleMapsUrl),
+    sanitize(lead.rating),
+    sanitize(lead.reviews),
+    sanitize(lead.websiteStatus),
+    sanitize(lead.websiteQuality),
+    sanitize(lead.mobileFriendly),
+    sanitize(lead.cta),
+    sanitize(lead.whatsApp),
+    sanitize(lead.onlineBooking),
+    sanitize(lead.adsStatus),
+    sanitize(lead.automationStatus),
+    sanitize(lead.aiOpportunity),
+    lead.leadScore ?? 0,
+    sanitize(lead.leadPriority),
+    sanitize(lead.recommendedService),
+    sanitize(lead.auditReason),
+    sanitize(lead.outreachMessage),
+    sanitize(lead.source),
+    sanitize(lead.dateAdded)
   ];
 
   try {
