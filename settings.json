@@ -1,3 +1,11 @@
 {
-  "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbweY3Tkl5xClfeOkNBcp01PlyjgY0Uns5q1JjvT7t3d4rxT08mR0YkhifNQiWFVO51P/exec"
+  "googleSheetWebhookUrl": "https://script.google.com/macros/s/AKfycbweY3Tkl5xClfeOkNBcp01PlyjgY0Uns5q1JjvT7t3d4rxT08mR0YkhifNQiWFVO51P/exec",
+  "waPhoneNumberId": "",
+  "waAccessToken": "",
+  "waBusinessPhone": "",
+  "waAccountId": "",
+  "waApiVersion": "v20.0",
+  "waMode": "BAILEYS"
 }
+
+

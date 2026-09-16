@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabTitles = {
     'tab-leads': { title: 'Qualified Leads & Audits', sub: 'Discover local businesses via OpenStreetMap & run deterministic website inspections' },
     'tab-instagram': { title: 'Instagram Business Lead Discovery', sub: 'Random qualified D2C sellers, boutiques, home bakers & service brands with public WhatsApp' },
-    'tab-whatsapp': { title: 'WhatsApp Outreach Center', sub: '100% Free Direct Web Socket automated client messenger' },
+    'tab-whatsapp': { title: 'WhatsApp Business Outreach Center', sub: 'Official Meta WhatsApp Business Cloud API & Direct 1-Click Outreach' },
     'tab-queue': { title: 'Search Queue Manager', sub: 'Manage automated searches for different cities and business categories' },
     'tab-sheets': { title: 'Google Sheets Live Sync', sub: 'Automatic real-time row insertion into your Google Sheet' }
   };
@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
       fetchInstagramLeads();
     } else if (tabId === 'tab-leads') {
       fetchLeads();
+    } else if (tabId === 'tab-whatsapp') {
+      loadWhatsAppConfig();
+      checkWhatsAppStatus();
     }
   }
 
@@ -126,10 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnWhatsappOutreach = document.getElementById('btn-whatsapp-outreach');
 
   // WhatsApp Elements
-  const waQrContainer = document.getElementById('wa-qr-container');
   const waQrImageBox = document.getElementById('wa-qr-image-box');
-  const waConnectedContainer = document.getElementById('wa-connected-container');
-  const waConnectedNumber = document.getElementById('wa-connected-number');
   const btnWaLogout = document.getElementById('btn-wa-logout');
   const btnStartWaCampaign = document.getElementById('btn-start-wa-campaign');
   const btnStopWaCampaign = document.getElementById('btn-stop-wa-campaign');
@@ -137,6 +137,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const waCampaignStatusText = document.getElementById('wa-campaign-status-text');
   const waCampaignCounter = document.getElementById('wa-campaign-counter');
   const waCampaignCurrentTarget = document.getElementById('wa-campaign-current-target');
+
+  // WhatsApp Cloud API Form Elements
+  const formWaCloudConfig = document.getElementById('form-wa-cloud-config');
+  const waInputPhoneId = document.getElementById('wa-input-phone-id');
+  const waInputAccessToken = document.getElementById('wa-input-access-token');
+  const waInputBizPhone = document.getElementById('wa-input-biz-phone');
+  const waInputAccountId = document.getElementById('wa-input-account-id');
+  const btnTestWaCloud = document.getElementById('btn-test-wa-cloud');
+  const btnSaveWaCloud = document.getElementById('btn-save-wa-cloud');
+  const waCloudTestStatus = document.getElementById('wa-cloud-test-status');
+  const waLiveStatusPill = document.getElementById('wa-live-status-pill');
 
   // Google Sheets Elements
   const sheetsConfigForm = document.getElementById('sheets-config-form');
@@ -173,8 +184,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const igManualPhone = document.getElementById('ig-manual-phone');
   const igManualBio = document.getElementById('ig-manual-bio');
 
+  const inputMemberName = document.getElementById('input-member-name');
+
   let currentLeads = [];
   let currentInstagramLeads = [];
+  let isCloudApiReady = false;
 
   // 1. Fetch Stats
   async function fetchStats() {
@@ -223,7 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 3. Render Leads Table (Sleek UI)
+  // Helper to get clean phone number digits
+  function getCleanDigits(phone) {
+    if (!phone) return null;
+    let digits = String(phone).replace(/[^0-9]/g, '');
+    if (!digits || digits.length < 8) return null;
+    if (digits.length === 10) digits = '91' + digits;
+    return digits;
+  }
+
+  // 3. Render Leads Table (Sleek UI with 1-Click WhatsApp DM)
   function renderLeadsTable(leads) {
     if (!leadsTbody) return;
     if (!leads || leads.length === 0) {
@@ -271,7 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="chip ${lead.onlineBooking === 'Detected' ? 'pass' : 'fail'}">Booking: ${lead.onlineBooking === 'Detected' ? 'Yes' : 'No'}</span>
       `;
 
-      const phoneDisplay = (lead.phone && lead.phone !== 'Not listed')
+      const cleanDigits = getCleanDigits(lead.phone);
+      const phoneDisplay = (lead.phone && lead.phone !== 'Not listed' && lead.phone !== 'DM for Contact')
         ? `<a href="tel:${escapeHtml(lead.phone)}" style="color:#34d399; font-weight:600; text-decoration:none; font-family:var(--font-mono); font-size:12px;">📞 ${escapeHtml(lead.phone)}</a>`
         : '<span style="color:#64748b; font-size:12px;">Not listed</span>';
 
@@ -293,6 +317,9 @@ document.addEventListener('DOMContentLoaded', () => {
           </span>
         </div>
       `;
+
+      // 1-Click WhatsApp Link URL
+      const waLink = cleanDigits ? `https://wa.me/${cleanDigits}?text=${encodeURIComponent(lead.outreachMessage || '')}` : '#';
 
       return `
         <tr>
@@ -325,19 +352,45 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="font-size:12px; color:var(--text-secondary); max-width:240px; line-height:1.4;">${escapeHtml(lead.auditReason || 'Opportunity detected')}</div>
           </td>
           <td>
-            <button class="btn btn-secondary btn-sm btn-pitch" data-id="${escapeHtml(lead.leadId || '')}" ${isSent ? 'style="border-color:#10b981; color:#059669;"' : ''}>
-              ${isSent ? '✅ Sent' : '💬 Pitch'}
-            </button>
+            <div style="display:flex; flex-direction:column; gap:5px;">
+              ${cleanDigits ? `
+                <button class="btn btn-emerald btn-sm btn-lead-send-wa" data-phone="${escapeHtml(lead.phone)}" data-leadid="${escapeHtml(lead.leadId)}" style="padding:4px 8px; font-size:11px; white-space:nowrap;">
+                  ⚡ ${isSent ? 'Resend WA' : '1-Click DM'}
+                </button>
+              ` : ''}
+              <div style="display:flex; gap:4px;">
+                <button class="btn btn-secondary btn-sm btn-pitch" data-id="${escapeHtml(lead.leadId || '')}" style="padding:3px 8px; font-size:11px; flex:1;">
+                  💬 Pitch
+                </button>
+                ${cleanDigits ? `
+                  <a href="${escapeHtml(waLink)}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Open in WhatsApp Web" style="padding:3px 6px; font-size:11px;">
+                    ↗
+                  </a>
+                ` : ''}
+              </div>
+            </div>
           </td>
         </tr>
       `;
     }).join('');
 
+    // Bind Pitch buttons
     document.querySelectorAll('.btn-pitch').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const leadId = e.target.getAttribute('data-id');
+        const leadId = e.currentTarget.getAttribute('data-id');
         const lead = currentLeads.find(l => l.leadId === leadId);
         if (lead) openOutreachModal(lead);
+      });
+    });
+
+    // Bind 1-Click WhatsApp Direct Send buttons
+    document.querySelectorAll('.btn-lead-send-wa').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const leadId = e.currentTarget.getAttribute('data-leadid');
+        const lead = currentLeads.find(l => l.leadId === leadId);
+        if (!lead) return;
+
+        await executeDirectWhatsAppSend(btn, lead);
       });
     });
   }
@@ -405,9 +458,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const cleanHandle = (lead.instagramHandle || lead.businessName || '').replace(/^@/, '');
       const igProfileUrl = `https://instagram.com/${cleanHandle}`;
       const igDmUrl = `https://ig.me/m/${cleanHandle}`;
-      const isSent = Boolean(lead.contactedBy || lead.contactStatus === 'Contacted');
+      const isSent = Boolean(lead.whatsappSent || lead.contactedBy || lead.contactStatus === 'Contacted');
       
-      const phoneValid = lead.phone && lead.phone !== 'DM for Contact' && lead.phone !== 'Not listed';
+      const cleanDigits = getCleanDigits(lead.phone);
+      const phoneValid = Boolean(cleanDigits && lead.phone !== 'DM for Contact' && lead.phone !== 'Not listed');
+      const waLink = cleanDigits ? `https://wa.me/${cleanDigits}?text=${encodeURIComponent(lead.outreachMessage || '')}` : '#';
 
       return `
         <tr>
@@ -438,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="color:#10b981; font-weight:700; font-size:13px; font-family:var(--font-mono);">${escapeHtml(lead.phone)}</span>
               </div>
-              <span class="pill-tag" style="font-size:10px; color:#10b981; background:rgba(16,185,129,0.1); margin-top:2px;">WhatsApp Verified</span>
+              <span class="pill-tag" style="font-size:10px; color:#10b981; background:rgba(16,185,129,0.1); margin-top:2px;">WhatsApp Ready</span>
             ` : `
               <span class="pill-tag" style="color:#fb7185; background:rgba(244,63,94,0.1);">DM for Contact</span>
             `}
@@ -454,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="display:flex; flex-direction:column; gap:6px;">
               ${phoneValid ? `
                 <button class="btn btn-emerald btn-sm btn-ig-send-wa" data-phone="${escapeHtml(lead.phone)}" data-leadid="${escapeHtml(lead.leadId)}" style="padding:4px 10px; font-size:11px;">
-                  💬 WhatsApp Pitch
+                  ⚡ ${isSent ? 'Resend WA' : '1-Click WhatsApp DM'}
                 </button>
               ` : ''}
               <div style="display:flex; gap:4px;">
@@ -464,6 +519,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="btn btn-secondary btn-sm btn-ig-pitch" data-id="${escapeHtml(lead.leadId)}" style="padding:3px 8px; font-size:11px; flex:1;">
                   📋 Pitch
                 </button>
+                ${phoneValid ? `
+                  <a href="${escapeHtml(waLink)}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Open in WhatsApp Web" style="padding:3px 6px; font-size:11px;">
+                    ↗
+                  </a>
+                ` : ''}
               </div>
             </div>
           </td>
@@ -486,40 +546,65 @@ document.addEventListener('DOMContentLoaded', () => {
         const lead = currentInstagramLeads.find(l => l.leadId === leadId);
         if (!lead) return;
 
-        const memberName = inputMemberName ? inputMemberName.value.trim() : 'Team Member';
-        e.currentTarget.disabled = true;
-        e.currentTarget.textContent = '⏳ Sending...';
-
-        try {
-          const res = await fetch('/api/whatsapp/send-single', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              phone: lead.phone,
-              message: lead.outreachMessage,
-              leadId: lead.leadId,
-              memberName
-            })
-          });
-          const data = await res.json();
-          if (data.success) {
-            e.currentTarget.textContent = '✅ Sent!';
-            e.currentTarget.style.background = '#10b981';
-            e.currentTarget.style.color = '#fff';
-            await fetchStats();
-          } else {
-            // If linked device is not connected, open pitch modal with 1-click wa.me link
-            openOutreachModal(lead);
-            e.currentTarget.textContent = '💬 WhatsApp Pitch';
-            e.currentTarget.disabled = false;
-          }
-        } catch (err) {
-          openOutreachModal(lead);
-          e.currentTarget.textContent = '💬 WhatsApp Pitch';
-          e.currentTarget.disabled = false;
-        }
+        await executeDirectWhatsAppSend(btn, lead);
       });
     });
+  }
+
+  // Unified Direct WhatsApp Send Handler
+  async function executeDirectWhatsAppSend(btnElement, lead) {
+    const memberName = inputMemberName ? inputMemberName.value.trim() : 'Team Member';
+    const originalText = btnElement.textContent;
+    btnElement.disabled = true;
+    btnElement.textContent = '⏳ Sending...';
+
+    try {
+      const res = await fetch('/api/whatsapp/send-single', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: lead.phone,
+          message: lead.outreachMessage,
+          leadId: lead.leadId,
+          memberName
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        btnElement.textContent = '✅ Sent!';
+        btnElement.style.background = '#10b981';
+        btnElement.style.color = '#fff';
+        lead.whatsappSent = true;
+        await fetchStats();
+        setTimeout(() => {
+          btnElement.disabled = false;
+          btnElement.textContent = '⚡ Resend WA';
+        }, 3000);
+      } else {
+        // Fallback: If not configured, launch WhatsApp directly via Web/Desktop
+        const cleanDigits = getCleanDigits(lead.phone);
+        if (cleanDigits) {
+          const directUrl = `https://wa.me/${cleanDigits}?text=${encodeURIComponent(lead.outreachMessage || '')}`;
+          window.open(directUrl, '_blank');
+          btnElement.textContent = '💬 Opened WA';
+        } else {
+          openOutreachModal(lead);
+          btnElement.textContent = originalText;
+        }
+        btnElement.disabled = false;
+      }
+    } catch (err) {
+      const cleanDigits = getCleanDigits(lead.phone);
+      if (cleanDigits) {
+        const directUrl = `https://wa.me/${cleanDigits}?text=${encodeURIComponent(lead.outreachMessage || '')}`;
+        window.open(directUrl, '_blank');
+      } else {
+        openOutreachModal(lead);
+      }
+      btnElement.textContent = originalText;
+      btnElement.disabled = false;
+    }
   }
 
   // 4. Quick Run Audit
@@ -742,10 +827,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Update WhatsApp link with new text
-    const phoneStr = String(activeModalLead.phone || '');
-    const cleanPhone = phoneStr.replace(/[^0-9]/g, '');
-    if (cleanPhone && cleanPhone.length >= 7) {
-      btnWhatsappOutreach.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(outreachText.value)}`;
+    const cleanDigits = getCleanDigits(activeModalLead.phone);
+    if (cleanDigits && btnWhatsappOutreach) {
+      btnWhatsappOutreach.href = `https://wa.me/${cleanDigits}?text=${encodeURIComponent(outreachText.value)}`;
     }
   }
 
@@ -793,20 +877,166 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 9. WhatsApp Status & Campaign
+  // ================================================================
+  // 9. WHATSAPP CLOUD API CONFIGURATION & STATUS
+  // ================================================================
+
+  async function loadWhatsAppConfig() {
+    try {
+      const res = await fetch('/api/whatsapp/config');
+      const data = await res.json();
+
+      if (waInputPhoneId && data.waPhoneNumberId) waInputPhoneId.value = data.waPhoneNumberId;
+      if (waInputAccessToken && data.waAccessToken) waInputAccessToken.value = data.waAccessToken;
+      if (waInputBizPhone && data.waBusinessPhone) waInputBizPhone.value = data.waBusinessPhone;
+      if (waInputAccountId && data.waAccountId) waInputAccountId.value = data.waAccountId;
+
+      isCloudApiReady = Boolean(data.isConfigured);
+    } catch (err) {
+      console.error('Error loading WhatsApp config:', err);
+    }
+  }
+
+  if (btnTestWaCloud) {
+    btnTestWaCloud.addEventListener('click', async () => {
+      const phoneNumberId = waInputPhoneId ? waInputPhoneId.value.trim() : '';
+      const accessToken = waInputAccessToken ? waInputAccessToken.value.trim() : '';
+
+      if (!phoneNumberId || !accessToken) {
+        alert('Please fill in both Phone Number ID and Access Token before testing.');
+        return;
+      }
+
+      btnTestWaCloud.disabled = true;
+      if (waCloudTestStatus) {
+        waCloudTestStatus.textContent = '⏳ Testing Meta Cloud API connection...';
+        waCloudTestStatus.style.color = '#3b82f6';
+      }
+
+      try {
+        const res = await fetch('/api/whatsapp/test-cloud-api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumberId, accessToken })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (waCloudTestStatus) {
+            waCloudTestStatus.innerHTML = `✅ Connected to Meta! Verified: <strong>${escapeHtml(data.verifiedName)}</strong> (${escapeHtml(data.displayPhoneNumber || 'Active')})`;
+            waCloudTestStatus.style.color = '#10b981';
+          }
+          if (waInputBizPhone && data.displayPhoneNumber && !waInputBizPhone.value) {
+            waInputBizPhone.value = data.displayPhoneNumber;
+          }
+          checkWhatsAppStatus();
+        } else {
+          if (waCloudTestStatus) {
+            waCloudTestStatus.textContent = `❌ Meta Error: ${data.error || 'Connection failed'}`;
+            waCloudTestStatus.style.color = '#ef4444';
+          }
+        }
+      } catch (err) {
+        if (waCloudTestStatus) {
+          waCloudTestStatus.textContent = `❌ Test Failed: ${err.message}`;
+          waCloudTestStatus.style.color = '#ef4444';
+        }
+      } finally {
+        btnTestWaCloud.disabled = false;
+      }
+    });
+  }
+
+  if (formWaCloudConfig) {
+    formWaCloudConfig.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const waPhoneNumberId = waInputPhoneId ? waInputPhoneId.value.trim() : '';
+      const waAccessToken = waInputAccessToken ? waInputAccessToken.value.trim() : '';
+      const waBusinessPhone = waInputBizPhone ? waInputBizPhone.value.trim() : '';
+      const waAccountId = waInputAccountId ? waInputAccountId.value.trim() : '';
+
+      if (btnSaveWaCloud) btnSaveWaCloud.disabled = true;
+      if (waCloudTestStatus) {
+        waCloudTestStatus.textContent = '💾 Saving credentials...';
+        waCloudTestStatus.style.color = '#3b82f6';
+      }
+
+      try {
+        const res = await fetch('/api/whatsapp/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ waPhoneNumberId, waAccessToken, waBusinessPhone, waAccountId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (waCloudTestStatus) {
+            waCloudTestStatus.textContent = '✅ WhatsApp Business Cloud API settings saved successfully!';
+            waCloudTestStatus.style.color = '#10b981';
+          }
+          isCloudApiReady = Boolean(waPhoneNumberId && waAccessToken);
+          checkWhatsAppStatus();
+        } else {
+          if (waCloudTestStatus) {
+            waCloudTestStatus.textContent = `❌ Failed to save: ${data.error}`;
+            waCloudTestStatus.style.color = '#ef4444';
+          }
+        }
+      } catch (err) {
+        if (waCloudTestStatus) {
+          waCloudTestStatus.textContent = `❌ Error: ${err.message}`;
+          waCloudTestStatus.style.color = '#ef4444';
+        }
+      } finally {
+        if (btnSaveWaCloud) btnSaveWaCloud.disabled = false;
+      }
+    });
+  }
+
+  // Check WhatsApp Status (Cloud API + Baileys fallback)
   async function checkWhatsAppStatus() {
     try {
       const res = await fetch('/api/whatsapp/status');
       const data = await res.json();
 
-      if (data.status === 'CONNECTED') {
-        if (navWaBadge) navWaBadge.textContent = 'Active';
+      if (data.status === 'CONNECTED_CLOUD_API') {
+        if (navWaBadge) {
+          navWaBadge.textContent = 'Cloud API';
+          navWaBadge.style.background = '#10b981';
+          navWaBadge.style.color = '#fff';
+        }
+        if (waStatusDot) waStatusDot.className = 'status-dot online';
+        if (waSidebarText) waSidebarText.textContent = `WA Business: ${data.cloudApi?.verifiedName || data.user}`;
+
+        if (waLiveStatusPill) {
+          waLiveStatusPill.innerHTML = `🟢 <strong>Meta Cloud API Active</strong> (${escapeHtml(data.cloudApi?.verifiedName || 'Verified')}: ${escapeHtml(data.user)})`;
+          waLiveStatusPill.style.background = 'rgba(16,185,129,0.15)';
+          waLiveStatusPill.style.color = '#059669';
+          waLiveStatusPill.style.border = '1px solid rgba(16,185,129,0.3)';
+        }
+
+        if (data.isCampaignRunning) {
+          if (waCampaignProgressBox) waCampaignProgressBox.classList.remove('hidden');
+          if (btnStartWaCampaign) btnStartWaCampaign.classList.add('hidden');
+          if (btnStopWaCampaign) btnStopWaCampaign.classList.remove('hidden');
+          if (waCampaignCounter) waCampaignCounter.textContent = `${data.campaignProgress.sent} / ${data.campaignProgress.total}`;
+          if (waCampaignCurrentTarget) waCampaignCurrentTarget.textContent = `Current: ${data.campaignProgress.current}`;
+        } else {
+          if (btnStartWaCampaign) btnStartWaCampaign.classList.remove('hidden');
+          if (btnStopWaCampaign) btnStopWaCampaign.classList.add('hidden');
+          if (waCampaignProgressBox) waCampaignProgressBox.classList.add('hidden');
+        }
+
+      } else if (data.status === 'CONNECTED') {
+        if (navWaBadge) navWaBadge.textContent = 'Active (Phone)';
         if (waStatusDot) waStatusDot.className = 'status-dot online';
         if (waSidebarText) waSidebarText.textContent = `WhatsApp: +${data.user}`;
 
-        if (waQrContainer) waQrContainer.classList.add('hidden');
-        if (waConnectedContainer) waConnectedContainer.classList.remove('hidden');
-        if (waConnectedNumber) waConnectedNumber.textContent = `+${data.user}`;
+        if (waLiveStatusPill) {
+          waLiveStatusPill.innerHTML = `🟢 <strong>Linked Phone Active</strong> (+${escapeHtml(data.user)})`;
+          waLiveStatusPill.style.background = 'rgba(16,185,129,0.15)';
+          waLiveStatusPill.style.color = '#059669';
+        }
 
         if (data.isCampaignRunning) {
           if (waCampaignProgressBox) waCampaignProgressBox.classList.remove('hidden');
@@ -818,22 +1048,20 @@ document.addEventListener('DOMContentLoaded', () => {
           if (btnStartWaCampaign) btnStartWaCampaign.classList.remove('hidden');
           if (btnStopWaCampaign) btnStopWaCampaign.classList.add('hidden');
         }
+
       } else {
-        if (navWaBadge) navWaBadge.textContent = 'Link App';
+        if (navWaBadge) navWaBadge.textContent = '1-Click Ready';
         if (waStatusDot) waStatusDot.className = 'status-dot';
-        if (waSidebarText) waSidebarText.textContent = 'WhatsApp: Offline';
+        if (waSidebarText) waSidebarText.textContent = 'WA: 1-Click Ready';
 
-        if (waConnectedContainer) waConnectedContainer.classList.add('hidden');
-        if (waQrContainer) waQrContainer.classList.remove('hidden');
+        if (waLiveStatusPill) {
+          waLiveStatusPill.innerHTML = `⚡ <strong>1-Click DM Mode</strong> (Or enter Meta API above for full automation)`;
+          waLiveStatusPill.style.background = 'rgba(234,88,12,0.1)';
+          waLiveStatusPill.style.color = '#ea580c';
+        }
 
-        if (data.qrCode) {
-          if (waQrImageBox) {
-            waQrImageBox.innerHTML = `<img src="${data.qrCode}" alt="WhatsApp QR Code" style="width:240px; height:240px; display:block;" />`;
-          }
-        } else {
-          if (waQrImageBox) {
-            waQrImageBox.innerHTML = `<div class="spinner" style="margin:40px auto;"></div><p style="font-size:12px; color:var(--text-tertiary);">Generating QR code...</p>`;
-          }
+        if (data.qrCode && waQrImageBox) {
+          waQrImageBox.innerHTML = `<img src="${data.qrCode}" alt="WhatsApp QR Code" style="width:200px; height:200px; display:block;" />`;
         }
       }
     } catch (err) {
@@ -850,7 +1078,221 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  const inputMemberName = document.getElementById('input-member-name');
+  // ================================================================
+  // 9.1 CUSTOM NUMBERS BULK DISPATCHER & TEMPLATES
+  // ================================================================
+  const bulkCustomNumbers = document.getElementById('bulk-custom-numbers');
+  const btnLoadIgNumbers = document.getElementById('btn-load-ig-numbers');
+  const btnLoadMapsNumbers = document.getElementById('btn-load-maps-numbers');
+  const btnClearBulkNumbers = document.getElementById('btn-clear-bulk-numbers');
+  const bulkNumbersCount = document.getElementById('bulk-numbers-count');
+  const bulkTemplateSelect = document.getElementById('bulk-template-select');
+  const bulkCustomMessage = document.getElementById('bulk-custom-message');
+  const bulkDispatchStatus = document.getElementById('bulk-dispatch-status');
+  const btnSendBulkCustomAuto = document.getElementById('btn-send-bulk-custom-auto');
+  const btnLaunchBulkWebQueue = document.getElementById('btn-launch-bulk-web-queue');
+
+  const pitchTemplates = {
+    'web-audit': `Namaste! 🙏\n\nMain aapke business ki online presence dekh raha tha. Humne aapke business ke liye ek Free Website & Digital Presence Audit prepare kiya hai jisse Google aur social media se direct customer inquiries 3x boost ho sakti hain.\n\nKya main aapke sath short 2-minute audit overview share karun?`,
+    'ig-store': `Hi! Loved your collection and products on Instagram. ✨\n\nAapke orders abhi manual DMs me process hote hain jisme kaafi time lagta hai. Hum aapke brand ke liye ek 1-Click WhatsApp Automated Storefront & Instant Catalog setup kar sakte hain jisse customer direct order place kar sakein.\n\nKya main aapke brand ke liye live demo share karun?`,
+    'speed-opt': `Hello! 🚀\n\nAapki website inspection me page loading speed aur mobile layout optimization ke opportunities detect huye hain. Fast loading websites se conversion rate 40% tak improve hota hai.\n\nHumne aapke liye ek quick optimization plan banaya hai. Kya hum connect kar sakte hain?`,
+    'custom': `Namaste! 🙏\n\nHum aapke business ke liye high-converting digital solutions aur website design offer karte hain. Kya hum short discussion kar sakte hain?`
+  };
+
+  // Initialize default template message
+  if (bulkCustomMessage) {
+    bulkCustomMessage.value = pitchTemplates['web-audit'];
+  }
+
+  if (bulkTemplateSelect) {
+    bulkTemplateSelect.addEventListener('change', () => {
+      const selected = bulkTemplateSelect.value;
+      if (bulkCustomMessage && pitchTemplates[selected]) {
+        bulkCustomMessage.value = pitchTemplates[selected];
+      }
+    });
+  }
+
+  function extractValidNumbersFromText(text) {
+    if (!text) return [];
+    // Match potential numbers separated by comma, space, newline, semicolons
+    const rawTokens = text.split(/[\n,;\s]+/);
+    const valid = [];
+    for (const token of rawTokens) {
+      const digits = getCleanDigits(token);
+      if (digits && digits.length >= 8 && !valid.includes(digits)) {
+        valid.push(digits);
+      }
+    }
+    return valid;
+  }
+
+  function updateBulkNumbersCount() {
+    if (!bulkCustomNumbers || !bulkNumbersCount) return;
+    const nums = extractValidNumbersFromText(bulkCustomNumbers.value);
+    bulkNumbersCount.textContent = nums.length;
+  }
+
+  if (bulkCustomNumbers) {
+    bulkCustomNumbers.addEventListener('input', updateBulkNumbersCount);
+  }
+
+  if (btnLoadIgNumbers) {
+    btnLoadIgNumbers.addEventListener('click', () => {
+      const igPhones = [];
+      for (const lead of currentInstagramLeads) {
+        const clean = getCleanDigits(lead.phone);
+        if (clean && !igPhones.includes(clean)) {
+          igPhones.push(clean);
+        }
+      }
+      if (igPhones.length === 0) {
+        alert('No Instagram leads with phone numbers loaded yet. Click "Generate Random Instagram Leads" in Instagram tab first.');
+        return;
+      }
+      const existing = bulkCustomNumbers ? bulkCustomNumbers.value.trim() : '';
+      const combined = existing ? `${existing}\n${igPhones.join('\n')}` : igPhones.join('\n');
+      if (bulkCustomNumbers) {
+        bulkCustomNumbers.value = combined;
+        updateBulkNumbersCount();
+      }
+      if (bulkTemplateSelect) {
+        bulkTemplateSelect.value = 'ig-store';
+        bulkCustomMessage.value = pitchTemplates['ig-store'];
+      }
+    });
+  }
+
+  if (btnLoadMapsNumbers) {
+    btnLoadMapsNumbers.addEventListener('click', () => {
+      const mapPhones = [];
+      for (const lead of currentLeads) {
+        const clean = getCleanDigits(lead.phone);
+        if (clean && !mapPhones.includes(clean)) {
+          mapPhones.push(clean);
+        }
+      }
+      if (mapPhones.length === 0) {
+        alert('No Google Maps leads found yet. Run an audit search in Leads tab first.');
+        return;
+      }
+      const existing = bulkCustomNumbers ? bulkCustomNumbers.value.trim() : '';
+      const combined = existing ? `${existing}\n${mapPhones.join('\n')}` : mapPhones.join('\n');
+      if (bulkCustomNumbers) {
+        bulkCustomNumbers.value = combined;
+        updateBulkNumbersCount();
+      }
+      if (bulkTemplateSelect) {
+        bulkTemplateSelect.value = 'web-audit';
+        bulkCustomMessage.value = pitchTemplates['web-audit'];
+      }
+    });
+  }
+
+  if (btnClearBulkNumbers) {
+    btnClearBulkNumbers.addEventListener('click', () => {
+      if (bulkCustomNumbers) {
+        bulkCustomNumbers.value = '';
+        updateBulkNumbersCount();
+      }
+      if (bulkDispatchStatus) bulkDispatchStatus.textContent = '';
+    });
+  }
+
+  // Auto Dispatcher to All Custom Numbers
+  if (btnSendBulkCustomAuto) {
+    btnSendBulkCustomAuto.addEventListener('click', async () => {
+      const numbers = extractValidNumbersFromText(bulkCustomNumbers ? bulkCustomNumbers.value : '');
+      const message = bulkCustomMessage ? bulkCustomMessage.value.trim() : '';
+      const memberName = inputMemberName ? inputMemberName.value.trim() : 'Team Member';
+
+      if (numbers.length === 0) {
+        alert('Please enter or load at least one phone number in the box above.');
+        return;
+      }
+      if (!message) {
+        alert('Pitch message cannot be empty.');
+        return;
+      }
+
+      btnSendBulkCustomAuto.disabled = true;
+      if (bulkDispatchStatus) {
+        bulkDispatchStatus.textContent = `⏳ Dispatching bulk message to ${numbers.length} numbers in background...`;
+        bulkDispatchStatus.style.color = '#3b82f6';
+      }
+
+      try {
+        const res = await fetch('/api/whatsapp/send-bulk-custom', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numbers, message, memberName })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          if (bulkDispatchStatus) {
+            bulkDispatchStatus.textContent = `✅ Bulk Completed! Successfully sent to ${data.sent} of ${data.total} numbers.`;
+            bulkDispatchStatus.style.color = '#10b981';
+          }
+          await fetchStats();
+        } else {
+          // If server messaging failed, offer 1-click web queue
+          if (bulkDispatchStatus) {
+            bulkDispatchStatus.textContent = `⚠️ Server Dispatch Notice: ${data.error || 'Failed'}. Use "1-Click Rapid Web Queue" button.`;
+            bulkDispatchStatus.style.color = '#f59e0b';
+          }
+        }
+      } catch (err) {
+        if (bulkDispatchStatus) {
+          bulkDispatchStatus.textContent = `❌ Error: ${err.message}. You can use "1-Click Rapid Web Queue" below.`;
+          bulkDispatchStatus.style.color = '#ef4444';
+        }
+      } finally {
+        btnSendBulkCustomAuto.disabled = false;
+      }
+    });
+  }
+
+  // 1-Click Rapid Web Queue (Zero-Config browser sequence)
+  let bulkQueueIndex = 0;
+  let bulkQueueNumbers = [];
+
+  if (btnLaunchBulkWebQueue) {
+    btnLaunchBulkWebQueue.addEventListener('click', () => {
+      bulkQueueNumbers = extractValidNumbersFromText(bulkCustomNumbers ? bulkCustomNumbers.value : '');
+      const message = bulkCustomMessage ? bulkCustomMessage.value.trim() : '';
+
+      if (bulkQueueNumbers.length === 0) {
+        alert('Please enter or load at least one phone number in the box above.');
+        return;
+      }
+      if (!message) {
+        alert('Pitch message cannot be empty.');
+        return;
+      }
+
+      if (bulkQueueIndex >= bulkQueueNumbers.length) {
+        bulkQueueIndex = 0;
+      }
+
+      const currentNum = bulkQueueNumbers[bulkQueueIndex];
+      const directUrl = `https://wa.me/${currentNum}?text=${encodeURIComponent(message)}`;
+      window.open(directUrl, '_blank');
+
+      bulkQueueIndex++;
+      if (bulkDispatchStatus) {
+        bulkDispatchStatus.innerHTML = `💬 Opened WhatsApp for <strong>+${currentNum}</strong> (${bulkQueueIndex}/${bulkQueueNumbers.length}). Click again to open next!`;
+        bulkDispatchStatus.style.color = '#059669';
+      }
+
+      if (bulkQueueIndex < bulkQueueNumbers.length) {
+        btnLaunchBulkWebQueue.textContent = `💬 Open Next (${bulkQueueIndex + 1}/${bulkQueueNumbers.length})`;
+      } else {
+        btnLaunchBulkWebQueue.textContent = `✅ All ${bulkQueueNumbers.length} Opened! (Restart)`;
+        bulkQueueIndex = 0;
+      }
+    });
+  }
 
   if (btnStartWaCampaign) {
     btnStartWaCampaign.addEventListener('click', async () => {
@@ -1022,7 +1464,6 @@ document.addEventListener('DOMContentLoaded', () => {
           await fetchInstagramLeads();
           await fetchLeads();
           await fetchStats();
-          // Open pitch modal for newly created lead
           if (data.lead) openOutreachModal(data.lead);
         } else {
           alert('Error: ' + (data.error || 'Failed to add Instagram lead'));
@@ -1049,6 +1490,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchInstagramLeads();
   loadQueueData();
   loadSheetsSettings();
+  loadWhatsAppConfig();
   checkWhatsAppStatus();
   setInterval(checkWhatsAppStatus, 5000);
 });

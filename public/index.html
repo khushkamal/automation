@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,12 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="app-layout">
     <!-- Left Sidebar -->
@@ -17,7 +21,8 @@
       <div class="brand-header">
         <div class="brand-logo-badge">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white" stroke="white" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </div>
         <div class="brand-info">
@@ -25,7 +30,8 @@
           <p>Agency Automation Suite</p>
         </div>
         <button id="btn-collapse-sidebar" class="btn-sidebar-collapse" title="Hide Sidebar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
@@ -33,35 +39,53 @@
 
       <nav class="sidebar-nav">
         <button class="nav-item active" data-tab="tab-leads">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="m10 15 5-3-5-3v6Z" />
+          </svg>
           <span>Leads & Audits</span>
           <span class="nav-badge" id="nav-leads-count">0</span>
         </button>
 
         <button class="nav-item" data-tab="tab-instagram">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
           </svg>
           <span>Instagram Leads</span>
-          <span class="nav-badge" id="nav-ig-badge" style="background: linear-gradient(135deg, #e1306c, #f77737); color: #fff;">D2C Hot</span>
+          <span class="nav-badge" id="nav-ig-badge"
+            style="background: linear-gradient(135deg, #e1306c, #f77737); color: #fff;">D2C Hot</span>
         </button>
 
         <button class="nav-item" data-tab="tab-whatsapp">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
           <span>WhatsApp Outreach</span>
           <span class="nav-badge" id="nav-wa-badge">Ready</span>
         </button>
 
         <button class="nav-item" data-tab="tab-queue">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
+          </svg>
           <span>Search Queue</span>
           <span class="nav-badge" id="nav-queue-count">3</span>
         </button>
 
         <button class="nav-item" data-tab="tab-sheets">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
           <span>Google Sheets Sync</span>
         </button>
       </nav>
@@ -84,7 +108,8 @@
       <header class="topbar">
         <div style="display:flex; align-items:center; gap:14px;">
           <button id="btn-toggle-sidebar" class="btn-sidebar-toggle" title="Toggle Sidebar (Show/Hide)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -92,21 +117,32 @@
           </button>
           <div class="topbar-title">
             <h2 id="topbar-page-title">Qualified Leads & Audits</h2>
-            <p id="topbar-page-sub">Discover local businesses via OpenStreetMap & run deterministic website inspections</p>
+            <p id="topbar-page-sub">Discover local businesses via OpenStreetMap & run deterministic website inspections
+            </p>
           </div>
         </div>
 
         <div class="topbar-actions">
-          <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:4px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); box-shadow:0 1px 2px rgba(0,0,0,0.03);">
-            <span style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">👤 Team Member:</span>
-            <input type="text" id="input-member-name" placeholder="Your Name" value="Member 1" style="border:none; outline:none; font-size:12px; font-weight:700; color:var(--brand-orange-dark); width:90px; background:transparent;">
+          <div
+            style="display:flex; align-items:center; gap:8px; background:#fff; padding:4px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+            <span style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">👤
+              Team Member:</span>
+            <input type="text" id="input-member-name" placeholder="Your Name" value="Member 1"
+              style="border:none; outline:none; font-size:12px; font-weight:700; color:var(--brand-orange-dark); width:90px; background:transparent;">
           </div>
           <button id="btn-export-csv" class="btn btn-secondary btn-sm">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
             Export CSV
           </button>
           <button class="btn btn-emerald btn-sm" id="btn-quick-wa-campaign">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.587 1.961.947 3.031.947 3.179 0 5.765-2.587 5.767-5.766.001-3.181-2.584-5.767-5.767-5.767zm0 10.373c-.931 0-1.802-.279-2.553-.762l-.182-.117-1.572.412.419-1.533-.128-.204c-.529-.844-.808-1.74-.807-2.671.002-2.529 2.059-4.586 4.589-4.586 2.529 0 4.586 2.058 4.586 4.588-.001 2.529-2.058 4.586-4.589 4.586z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.587 1.961.947 3.031.947 3.179 0 5.765-2.587 5.767-5.766.001-3.181-2.584-5.767-5.767-5.767zm0 10.373c-.931 0-1.802-.279-2.553-.762l-.182-.117-1.572.412.419-1.533-.128-.204c-.529-.844-.808-1.74-.807-2.671.002-2.529 2.059-4.586 4.589-4.586 2.529 0 4.586 2.058 4.586 4.588-.001 2.529-2.058 4.586-4.589 4.586z" />
+            </svg>
             WhatsApp Campaign
           </button>
         </div>
@@ -119,7 +155,10 @@
           <div class="metric-card">
             <div class="metric-header">
               <span>Total Qualified Leads</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg>
             </div>
             <div class="metric-value" id="stat-total">0</div>
             <div class="metric-footer">Qualified & saved in database</div>
@@ -146,7 +185,9 @@
           <div class="metric-card">
             <div class="metric-header">
               <span>🛡️ Deduplicated Places</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
             </div>
             <div class="metric-value" style="color:#a78bfa;" id="stat-dedup">0</div>
             <div class="metric-footer">Protected from duplicate entries</div>
@@ -156,10 +197,15 @@
         <!-- Search Discovery Panel -->
         <div class="search-card">
           <!-- High-Ticket Budget Filter Bar -->
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(234,88,12,0.1); border:1px solid rgba(234,88,12,0.25); border-radius:20px; padding:3px 10px;">
-              <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">💎 High-Ticket Profitable Niches:</span>
-              <span style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">High Purchasing Power</span>
+          <div
+            style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+            <div
+              style="display:inline-flex; align-items:center; gap:6px; background:rgba(234,88,12,0.1); border:1px solid rgba(234,88,12,0.25); border-radius:20px; padding:3px 10px;">
+              <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">💎 High-Ticket Profitable
+                Niches:</span>
+              <span
+                style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">High
+                Purchasing Power</span>
             </div>
             <div style="font-size:11px; color:var(--text-tertiary); font-weight:600;">
               🛡️ Low-profit kirana/micro-shops are automatically filtered out
@@ -168,27 +214,40 @@
 
           <!-- 1-Click High-Ticket Presets -->
           <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;" id="high-ticket-presets">
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="cosmetic clinic" style="font-size:11px; padding:4px 9px;">🏥 Cosmetic / Dermatology</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="dental clinic" style="font-size:11px; padding:4px 9px;">🦷 Dental & Implants</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="real estate agency" style="font-size:11px; padding:4px 9px;">🏢 Real Estate & Builders</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="interior designer" style="font-size:11px; padding:4px 9px;">🛋️ Interior Designers</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="law firm" style="font-size:11px; padding:4px 9px;">⚖️ Law & Legal Firms</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="chartered accountant" style="font-size:11px; padding:4px 9px;">📊 CA & Tax Advisory</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="luxury hotel" style="font-size:11px; padding:4px 9px;">🏨 Luxury Hotels & Resorts</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="car detailing" style="font-size:11px; padding:4px 9px;">🚗 Car Detailing Studios</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="solar installer" style="font-size:11px; padding:4px 9px;">☀️ Solar Contractors</button>
-            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="immigration consultant" style="font-size:11px; padding:4px 9px;">✈️ Study Abroad / Visa</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="cosmetic clinic"
+              style="font-size:11px; padding:4px 9px;">🏥 Cosmetic / Dermatology</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="dental clinic"
+              style="font-size:11px; padding:4px 9px;">🦷 Dental & Implants</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="real estate agency"
+              style="font-size:11px; padding:4px 9px;">🏢 Real Estate & Builders</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="interior designer"
+              style="font-size:11px; padding:4px 9px;">🛋️ Interior Designers</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="law firm"
+              style="font-size:11px; padding:4px 9px;">⚖️ Law & Legal Firms</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="chartered accountant"
+              style="font-size:11px; padding:4px 9px;">📊 CA & Tax Advisory</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="luxury hotel"
+              style="font-size:11px; padding:4px 9px;">🏨 Luxury Hotels & Resorts</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="car detailing"
+              style="font-size:11px; padding:4px 9px;">🚗 Car Detailing Studios</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset" data-keyword="solar installer"
+              style="font-size:11px; padding:4px 9px;">☀️ Solar Contractors</button>
+            <button type="button" class="btn btn-secondary btn-sm btn-niche-preset"
+              data-keyword="immigration consultant" style="font-size:11px; padding:4px 9px;">✈️ Study Abroad /
+              Visa</button>
           </div>
 
           <form id="quick-run-form" class="search-form">
             <div class="form-group">
               <label for="input-keyword">High-Ticket Niche / Category</label>
-              <input type="text" id="input-keyword" class="form-control" placeholder="e.g. cosmetic clinic, dental clinic, real estate, interior designer" required>
+              <input type="text" id="input-keyword" class="form-control"
+                placeholder="e.g. cosmetic clinic, dental clinic, real estate, interior designer" required>
             </div>
 
             <div class="form-group">
               <label for="input-city">Target City / Area</label>
-              <input type="text" id="input-city" class="form-control" placeholder="e.g. Mumbai, Delhi NCR, Bangalore, Dubai, London" required>
+              <input type="text" id="input-city" class="form-control"
+                placeholder="e.g. Mumbai, Delhi NCR, Bangalore, Dubai, London" required>
             </div>
 
             <div class="form-group">
@@ -204,10 +263,13 @@
           </form>
 
           <!-- Worldwide Random Generator Bar -->
-          <div style="display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+          <div
+            style="display:flex; align-items:center; justify-content:space-between; padding-top:14px; border-top:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">🌍 Worldwide High-Ticket Discovery:</span>
-              <select id="select-random-region" class="form-control" style="padding:4px 10px; font-size:12px; font-weight:600; width:auto;">
+              <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">🌍 Worldwide High-Ticket
+                Discovery:</span>
+              <select id="select-random-region" class="form-control"
+                style="padding:4px 10px; font-size:12px; font-weight:600; width:auto;">
                 <option value="Worldwide">🌐 All Worldwide (Random)</option>
                 <option value="USA">🇺🇸 USA (New York, LA, Miami...)</option>
                 <option value="UK">🇬🇧 UK (London, Manchester...)</option>
@@ -223,7 +285,8 @@
               <button type="button" id="btn-roll-random-inputs" class="btn btn-secondary btn-sm">
                 🎲 Pick High-Ticket City/Niche
               </button>
-              <button type="button" id="btn-run-random-worldwide" class="btn btn-emerald btn-sm" style="background:linear-gradient(135deg, #ea580c, #f97316);">
+              <button type="button" id="btn-run-random-worldwide" class="btn btn-emerald btn-sm"
+                style="background:linear-gradient(135deg, #ea580c, #f97316);">
                 ⚡ 1-Click Discover High-Budget Leads
               </button>
             </div>
@@ -234,8 +297,10 @@
         <div id="execution-status" class="status-banner hidden">
           <div class="spinner"></div>
           <div>
-            <div style="font-weight:600; font-size:13px; color:#60a5fa;" id="status-text">Querying OpenStreetMap for High-Ticket Businesses...</div>
-            <div style="font-size:12px; color:var(--text-secondary);" id="status-detail">Filtering small micro-stores and auditing website inspection signals...</div>
+            <div style="font-weight:600; font-size:13px; color:#60a5fa;" id="status-text">Querying OpenStreetMap for
+              High-Ticket Businesses...</div>
+            <div style="font-size:12px; color:var(--text-secondary);" id="status-detail">Filtering small micro-stores
+              and auditing website inspection signals...</div>
           </div>
         </div>
 
@@ -243,7 +308,8 @@
         <div class="table-card">
           <div class="table-toolbar">
             <div class="filter-group">
-              <input type="text" id="search-input" class="form-control filter-input" placeholder="Search by name, city, phone, category...">
+              <input type="text" id="search-input" class="form-control filter-input"
+                placeholder="Search by name, city, phone, category...">
               <select id="filter-priority" class="form-control">
                 <option value="All">All Priorities</option>
                 <option value="Hot">🔥 Hot (Score 80-100)</option>
@@ -279,8 +345,10 @@
                 <tr>
                   <td colspan="8" class="empty-state-cell">
                     <div class="empty-icon">🔍</div>
-                    <h3 style="color:var(--text-primary); font-size:15px; margin-bottom:4px;">No qualified leads generated yet</h3>
-                    <p style="font-size:12px;">Select a high-ticket niche above or run a search to discover high-value businesses.</p>
+                    <h3 style="color:var(--text-primary); font-size:15px; margin-bottom:4px;">No qualified leads
+                      generated yet</h3>
+                    <p style="font-size:12px;">Select a high-ticket niche above or run a search to discover high-value
+                      businesses.</p>
                   </td>
                 </tr>
               </tbody>
@@ -292,19 +360,28 @@
       <!-- TAB: INSTAGRAM BUSINESS DISCOVERY -->
       <section id="tab-instagram" class="tab-content page-body">
         <!-- Instagram Lead Generation Hero Card -->
-        <div class="search-card" style="border: 1px solid rgba(225,48,108,0.3); background: radial-gradient(circle at top right, rgba(225,48,108,0.08), transparent 70%), var(--bg-surface);">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+        <div class="search-card"
+          style="border: 1px solid rgba(225,48,108,0.3); background: radial-gradient(circle at top right, rgba(225,48,108,0.08), transparent 70%), var(--bg-surface);">
+          <div
+            style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
             <div>
-              <div style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, rgba(225,48,108,0.2), rgba(247,119,55,0.2)); border:1px solid rgba(225,48,108,0.4); border-radius:20px; padding:4px 12px; margin-bottom:8px;">
-                <span style="font-size:12px; font-weight:800; background:linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">📸 100% FREE INSTAGRAM DISCOVERY</span>
-                <span style="font-size:10px; background:#e1306c; color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Zero Inputs Required</span>
+              <div
+                style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, rgba(225,48,108,0.2), rgba(247,119,55,0.2)); border:1px solid rgba(225,48,108,0.4); border-radius:20px; padding:4px 12px; margin-bottom:8px;">
+                <span
+                  style="font-size:12px; font-weight:800; background:linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">📸
+                  100% FREE INSTAGRAM DISCOVERY</span>
+                <span
+                  style="font-size:10px; background:#e1306c; color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Zero
+                  Inputs Required</span>
               </div>
-              <h3 style="font-size:18px; font-weight:800; color:var(--text-primary); margin-bottom:4px;">Random Qualified Instagram Lead Generator</h3>
+              <h3 style="font-size:18px; font-weight:800; color:var(--text-primary); margin-bottom:4px;">Random
+                Qualified Instagram Lead Generator</h3>
               <p style="font-size:13px; color:var(--text-secondary); max-width:640px;">
-                Instantly generates a mixed, high-converting list of active D2C sellers, boutiques, home bakers, jewelry stores & custom brands with public WhatsApp numbers. Category and location are detected automatically.
+                Instantly generates a mixed, high-converting list of active D2C sellers, boutiques, home bakers, jewelry
+                stores & custom brands with public WhatsApp numbers. Category and location are detected automatically.
               </p>
             </div>
-            
+
             <div style="display:flex; gap:10px; align-items:center;">
               <button id="btn-open-ig-manual-modal" class="btn btn-secondary btn-sm" style="height:38px;">
                 ➕ Add Custom IG Lead
@@ -313,9 +390,12 @@
           </div>
 
           <!-- 1-Click Action Bar -->
-          <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <div
+            style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; background:var(--bg-surface-elevated); padding:16px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
             <div style="display:flex; align-items:center; gap:8px;">
-              <label style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Batch Size:</label>
+              <label
+                style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Batch
+                Size:</label>
               <select id="ig-batch-size" class="form-control" style="width:110px; height:42px; font-weight:700;">
                 <option value="10" selected>10 Leads</option>
                 <option value="15">15 Leads</option>
@@ -324,13 +404,19 @@
               </select>
             </div>
 
-            <button id="btn-generate-random-ig" class="btn btn-primary" style="height:42px; padding:0 24px; font-size:14px; font-weight:700; background:linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border:none; box-shadow:0 4px 15px rgba(225,48,108,0.35); flex-grow:1; max-width:380px;">
-              <span id="ig-btn-spinner" class="spinner hidden" style="width:16px; height:16px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:8px;"></span>
+            <button id="btn-generate-random-ig" class="btn btn-primary"
+              style="height:42px; padding:0 24px; font-size:14px; font-weight:700; background:linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border:none; box-shadow:0 4px 15px rgba(225,48,108,0.35); flex-grow:1; max-width:380px;">
+              <span id="ig-btn-spinner" class="spinner hidden"
+                style="width:16px; height:16px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:8px;"></span>
               <span id="ig-btn-text">🎲 Generate Random Instagram Leads</span>
             </button>
 
             <div style="font-size:12px; color:var(--text-tertiary); display:flex; align-items:center; gap:6px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
               <span>Auto-rotates 15+ niches (Boutiques, Bakers, Jewelry, Skincare, etc.) & major Indian hubs</span>
             </div>
           </div>
@@ -379,7 +465,8 @@
         <div class="table-card">
           <div class="table-toolbar" style="display:flex; justify-content:space-between; align-items:center;">
             <div class="filter-group">
-              <input type="text" id="ig-search-input" class="form-control filter-input" placeholder="Search by handle, brand name, niche, city...">
+              <input type="text" id="ig-search-input" class="form-control filter-input"
+                placeholder="Search by handle, brand name, niche, city...">
               <select id="ig-filter-niche" class="form-control">
                 <option value="All">All Niches</option>
                 <option value="Boutique & Designer Wear">Boutique & Designer Wear</option>
@@ -393,7 +480,8 @@
               </select>
             </div>
             <div style="font-size:12px; color:var(--text-secondary); font-weight:600;">
-              Showing <span id="ig-table-count" style="color:var(--text-primary); font-weight:800;">0</span> Instagram Leads
+              Showing <span id="ig-table-count" style="color:var(--text-primary); font-weight:800;">0</span> Instagram
+              Leads
             </div>
           </div>
 
@@ -414,8 +502,10 @@
                 <tr>
                   <td colspan="7" class="empty-state-cell">
                     <div class="empty-icon">📸</div>
-                    <h3 style="color:var(--text-primary); font-size:15px; margin-bottom:4px;">No Instagram leads generated yet</h3>
-                    <p style="font-size:12px;">Click <strong>"🎲 Generate Random Instagram Leads"</strong> above to instantly discover qualified D2C sellers & businesses.</p>
+                    <h3 style="color:var(--text-primary); font-size:15px; margin-bottom:4px;">No Instagram leads
+                      generated yet</h3>
+                    <p style="font-size:12px;">Click <strong>"🎲 Generate Random Instagram Leads"</strong> above to
+                      instantly discover qualified D2C sellers & businesses.</p>
                   </td>
                 </tr>
               </tbody>
@@ -426,54 +516,213 @@
 
       <!-- TAB 2: WHATSAPP OUTREACH CENTER -->
       <section id="tab-whatsapp" class="tab-content page-body">
-        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px;">
-          <!-- QR Code State -->
-          <div id="wa-qr-container" style="text-align:center; padding:20px;">
-            <h3 style="color:var(--text-primary); font-size:18px; margin-bottom:8px;">Link Your WhatsApp Business</h3>
-            <p style="color:var(--text-secondary); font-size:13px; max-width:480px; margin:0 auto 20px;">
-              Scan the QR code from WhatsApp on your phone (<strong>Settings / Menu ➔ Linked Devices ➔ Link a Device</strong>).
-            </p>
-            <div id="wa-qr-image-box" style="background:#fff; padding:16px; border-radius:var(--radius-md); display:inline-block; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-              <div class="spinner" style="margin:40px auto;"></div>
-            </div>
-            <p style="font-size:12px; color:var(--text-tertiary); margin-top:14px;">100% Free Direct Web Socket connection. No API subscriptions needed.</p>
-          </div>
-
-          <!-- Connected State -->
-          <div id="wa-connected-container" class="hidden" style="display:flex; flex-direction:column; gap:20px;">
-            <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:var(--radius-sm); padding:16px 20px;">
-              <div>
-                <div style="font-size:11px; font-weight:700; color:var(--brand-emerald); text-transform:uppercase; letter-spacing:0.5px;">🟢 System Connected</div>
-                <div style="font-size:18px; font-weight:700; color:var(--text-primary); font-family:var(--font-mono); margin-top:2px;" id="wa-connected-number">+91...</div>
+        <!-- 1. Meta WhatsApp Business Cloud API Card (Primary Official Integration) -->
+        <div class="search-card"
+          style="border: 1px solid rgba(16,185,129,0.4); background: radial-gradient(circle at top right, rgba(16,185,129,0.08), transparent 70%), var(--bg-surface);">
+          <div
+            style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
+            <div>
+              <div
+                style="display:inline-flex; align-items:center; gap:8px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); border-radius:20px; padding:4px 14px; margin-bottom:8px;">
+                <span style="font-size:12px; font-weight:800; color:var(--brand-emerald);">⚡ OFFICIAL META WHATSAPP BUSINESS CLOUD API</span>
+                <span
+                  style="font-size:10px; background:var(--brand-emerald); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Zero QR Scan Required</span>
               </div>
-              <button id="btn-wa-logout" class="btn btn-secondary btn-sm" style="color:#fb7185;">Disconnect Device</button>
-            </div>
-
-            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:20px;">
-              <h4 style="color:var(--text-primary); font-size:15px; margin-bottom:6px;">Automated Outreach Dispatcher</h4>
-              <p style="font-size:13px; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;">
-                Loops through qualified leads with valid phone numbers and automatically delivers their custom website audit pitch. Includes randomized 6–10s anti-ban delays.
+              <h3 style="font-size:18px; font-weight:800; color:var(--text-primary); margin-bottom:4px;">Meta WhatsApp Cloud API Direct Dispatcher</h3>
+              <p style="font-size:13px; color:var(--text-secondary); max-width:680px;">
+                Send verified WhatsApp audit pitches directly to Instagram & Google Maps leads via official Meta Cloud API. No phone pairing, QR code scanning, or battery drain.
               </p>
-              
-              <div style="display:flex; gap:12px;">
-                <button id="btn-start-wa-campaign" class="btn btn-emerald">
-                  🚀 Start 1-Click Automated Campaign
+            </div>
+
+            <div id="wa-connection-badge-container">
+              <span id="wa-live-status-pill" class="pill-tag"
+                style="padding:6px 14px; font-size:13px; font-weight:700; background:rgba(100,116,139,0.1); color:var(--text-secondary);">
+                ⚪ Checking Status...
+              </span>
+            </div>
+          </div>
+
+          <!-- Meta Cloud API Configuration Form -->
+          <form id="form-wa-cloud-config"
+            style="display:flex; flex-direction:column; gap:14px; background:var(--bg-surface-elevated); padding:18px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+            <div
+              style="font-size:13px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+              <span>🔑 Meta Developer WhatsApp Credentials</span>
+              <span style="font-size:11px; font-weight:500; color:var(--text-tertiary);">(From developers.facebook.com ➔ WhatsApp ➔ API Setup)</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+              <div class="form-group">
+                <label for="wa-input-phone-id">Phone Number ID *</label>
+                <input type="text" id="wa-input-phone-id" class="form-control" placeholder="e.g. 548291048291049" required>
+              </div>
+
+              <div class="form-group">
+                <label for="wa-input-access-token">Permanent Access Token (Bearer) *</label>
+                <input type="password" id="wa-input-access-token" class="form-control" placeholder="EAAG..." required>
+              </div>
+
+              <div class="form-group">
+                <label for="wa-input-biz-phone">Sender WhatsApp Number</label>
+                <input type="text" id="wa-input-biz-phone" class="form-control" placeholder="e.g. +91 98765 43210">
+              </div>
+
+              <div class="form-group">
+                <label for="wa-input-account-id">WhatsApp Business Account ID (WABA ID)</label>
+                <input type="text" id="wa-input-account-id" class="form-control" placeholder="e.g. 1093829102938">
+              </div>
+            </div>
+
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:4px;">
+              <div id="wa-cloud-test-status" style="font-size:12px; font-weight:600;"></div>
+
+              <div style="display:flex; gap:10px;">
+                <button type="button" id="btn-test-wa-cloud" class="btn btn-secondary btn-sm" style="height:38px;">
+                  🧪 Test Meta Connection
                 </button>
-                <button id="btn-stop-wa-campaign" class="btn btn-secondary hidden" style="color:#fb7185;">
-                  ⏹ Stop Campaign
+                <button type="submit" id="btn-save-wa-cloud" class="btn btn-emerald btn-sm"
+                  style="height:38px; padding:0 22px; font-weight:700;">
+                  💾 Save WhatsApp Business API
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- 2. Direct Multi-Number Bulk Sender (Custom Numbers & Instant 1-Click) -->
+        <div class="search-card" style="border: 1px solid rgba(249,115,22,0.35); background: radial-gradient(circle at top right, rgba(249,115,22,0.06), transparent 70%), var(--bg-surface);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.3); border-radius:20px; padding:4px 12px; margin-bottom:6px;">
+                <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">🚀 1-CLICK CUSTOM NUMBER BULK SENDER</span>
+                <span style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Paste Any Numbers</span>
+              </div>
+              <h3 style="font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">Add Numbers & Send Bulk WhatsApp DMs</h3>
+              <p style="font-size:13px; color:var(--text-secondary);">
+                Paste any custom numbers or load leads with 1 click to blast personalized pitches instantly.
+              </p>
+            </div>
+          </div>
+
+          <!-- Numbers Input & Quick Load Bar -->
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <label for="bulk-custom-numbers" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
+                Enter / Paste Phone Numbers (Comma, space, or new line separated):
+              </label>
+              <div style="display:flex; gap:6px;">
+                <button type="button" id="btn-load-ig-numbers" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 9px;">
+                  📸 + Load Instagram Leads
+                </button>
+                <button type="button" id="btn-load-maps-numbers" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 9px;">
+                  📍 + Load Google Maps Leads
+                </button>
+                <button type="button" id="btn-clear-bulk-numbers" class="btn btn-ghost btn-sm" style="font-size:11px; padding:4px 8px; color:#fb7185;">
+                  ✕ Clear
                 </button>
               </div>
             </div>
 
-            <!-- Campaign Progress Indicator -->
-            <div id="wa-campaign-progress-box" class="hidden" style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:var(--radius-sm); padding:16px;">
-              <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:8px;">
-                <span id="wa-campaign-status-text" style="color:#60a5fa;">Dispatching pitches in background...</span>
-                <span id="wa-campaign-counter" style="color:var(--text-primary); font-family:var(--font-mono);">0 / 0</span>
+            <textarea id="bulk-custom-numbers" class="form-control" rows="3" placeholder="e.g. 9811223344, 9876543210, +91 9123456789 (Or click buttons above to auto-load leads)" style="font-family:var(--font-mono); font-size:12px;"></textarea>
+            
+            <div style="font-size:11px; color:var(--text-tertiary); font-weight:600;">
+              Detected: <span id="bulk-numbers-count" style="color:var(--brand-orange-dark); font-weight:800;">0</span> valid numbers ready to message.
+            </div>
+
+            <!-- Pitch Message & Template Selector -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:4px;">
+              <label for="bulk-custom-message" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
+                Pitch Message:
+              </label>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:11px; color:var(--text-tertiary);">Quick Template:</span>
+                <select id="bulk-template-select" class="form-control" style="font-size:11px; padding:3px 8px; height:auto; width:auto;">
+                  <option value="web-audit">🌐 High-Converting Website Pitch</option>
+                  <option value="ig-store">🛍️ Instagram WhatsApp Storefront Pitch</option>
+                  <option value="speed-opt">⚡ Fast Speed & Mobile Optimization</option>
+                  <option value="custom">✏️ Custom Message</option>
+                </select>
               </div>
-              <div style="font-size:12px; color:var(--text-secondary);" id="wa-campaign-current-target">Current: ...</div>
+            </div>
+
+            <textarea id="bulk-custom-message" class="pitch-textarea" rows="4"></textarea>
+
+            <!-- Dispatch Action Buttons -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:6px;">
+              <div id="bulk-dispatch-status" style="font-size:12px; font-weight:600;"></div>
+
+              <div style="display:flex; gap:10px;">
+                <button type="button" id="btn-launch-bulk-web-queue" class="btn btn-secondary" style="font-weight:700; height:42px;">
+                  💬 1-Click Rapid Web Queue
+                </button>
+                <button type="button" id="btn-send-bulk-custom-auto" class="btn btn-emerald" style="font-weight:800; height:42px; padding:0 24px; box-shadow:0 4px 14px rgba(16,185,129,0.3);">
+                  🚀 1-Click Blast to All Numbers
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- 3. Campaign Hub -->
+        <div
+          style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:20px;">
+          <div>
+            <h4 style="color:var(--text-primary); font-size:16px; font-weight:800; margin-bottom:4px;">🚀 1-Click
+              Automated Campaign Dispatcher</h4>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+              Automatically sends customized pitches to all qualified leads (Google Maps + Instagram). Includes built-in
+              multi-member anti-duplicate lock & smart delays.
+            </p>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+            <button id="btn-start-wa-campaign" class="btn btn-emerald"
+              style="padding:12px 28px; font-size:14px; font-weight:800; box-shadow:0 4px 14px rgba(16,185,129,0.3);">
+              🚀 Start 1-Click Automated Campaign
+            </button>
+            <button id="btn-stop-wa-campaign" class="btn btn-secondary hidden"
+              style="color:#fb7185; padding:12px 24px; font-weight:700;">
+              ⏹ Stop Campaign
+            </button>
+            <span style="font-size:12px; color:var(--text-tertiary);">✨ Any client already messaged by any team member
+              is automatically skipped</span>
+          </div>
+
+          <!-- Campaign Progress Indicator -->
+          <div id="wa-campaign-progress-box" class="hidden"
+            style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:var(--radius-sm); padding:16px;">
+            <div
+              style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:8px;">
+              <span id="wa-campaign-status-text" style="color:#60a5fa;">Dispatching pitches in background...</span>
+              <span id="wa-campaign-counter"
+                style="color:var(--text-primary); font-family:var(--font-mono); font-weight:800;">0 / 0</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-secondary);" id="wa-campaign-current-target">Current: ...</div>
+          </div>
+
+          <!-- 3. Optional QR Scan Collapsible (Fallback) -->
+          <details
+            style="margin-top:8px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+            <summary
+              style="font-size:12px; font-weight:700; color:var(--text-secondary); cursor:pointer; user-select:none;">
+              📱 Optional: Link Personal WhatsApp via Phone QR Scan (Baileys)
+            </summary>
+            <div style="text-align:center; padding:16px 0 8px;">
+              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+                Scan QR code from your phone's WhatsApp (Linked Devices) if you want to use phone socket instead of Meta
+                Cloud API:
+              </p>
+              <div id="wa-qr-image-box"
+                style="background:#fff; padding:14px; border-radius:var(--radius-md); display:inline-block; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+                <div class="spinner" style="margin:20px auto;"></div>
+              </div>
+              <div style="margin-top:10px;">
+                <button id="btn-wa-logout" class="btn btn-secondary btn-sm"
+                  style="color:#fb7185; font-size:11px;">Disconnect Linked Device</button>
+              </div>
+            </div>
+          </details>
         </div>
       </section>
 
@@ -481,7 +730,8 @@
       <section id="tab-queue" class="tab-content page-body">
         <div class="search-card">
           <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">Add Search to Queue</h3>
-          <form id="add-queue-form" style="display:grid; grid-template-columns:2fr 2fr 1fr auto; gap:12px; align-items:flex-end;">
+          <form id="add-queue-form"
+            style="display:grid; grid-template-columns:2fr 2fr 1fr auto; gap:12px; align-items:flex-end;">
             <div class="form-group">
               <label>Keyword / Category</label>
               <input type="text" id="queue-keyword" class="form-control" placeholder="e.g. dentist, clinic" required>
@@ -525,21 +775,27 @@
 
       <!-- TAB 4: GOOGLE SHEETS SYNC -->
       <section id="tab-sheets" class="tab-content page-body">
-        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:20px;">
+        <div
+          style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:20px;">
           <div>
             <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">📊 Google Sheets Live Auto-Sync</h3>
             <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
-              Connect your Google Sheet via free Apps Script webhook so every qualified lead is automatically inserted in real time.
+              Connect your Google Sheet via free Apps Script webhook so every qualified lead is automatically inserted
+              in real time.
             </p>
           </div>
 
-          <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:16px;">
-            <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:8px;">Quick 1-Minute Setup Instructions:</div>
+          <div
+            style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:8px;">Quick 1-Minute
+              Setup Instructions:</div>
             <ol style="font-size:13px; color:var(--text-secondary); margin-left:20px; line-height:1.6;">
               <li>Open your Google Sheet (named <strong>Automation</strong>).</li>
               <li>Go to <strong>Extensions > Apps Script</strong>.</li>
-              <li>Paste the code from <a href="file:///d:/Project/Automation/GoogleAppsScript_Sync.js" style="color:var(--brand-primary);">GoogleAppsScript_Sync.js</a> and click Save.</li>
-              <li>Click <strong>Deploy > New Deployment > Web app</strong> (Set 'Who has access' to <strong>Anyone</strong>).</li>
+              <li>Paste the code from <a href="file:///d:/Project/Automation/GoogleAppsScript_Sync.js"
+                  style="color:var(--brand-primary);">GoogleAppsScript_Sync.js</a> and click Save.</li>
+              <li>Click <strong>Deploy > New Deployment > Web app</strong> (Set 'Who has access' to
+                <strong>Anyone</strong>).</li>
               <li>Copy the Web app URL and paste it below.</li>
             </ol>
           </div>
@@ -547,7 +803,8 @@
           <form id="sheets-config-form" style="display:flex; flex-direction:column; gap:12px;">
             <div class="form-group">
               <label for="input-webhook-url">Google Apps Script Web App URL</label>
-              <input type="url" id="input-webhook-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec" required>
+              <input type="url" id="input-webhook-url" class="form-control"
+                placeholder="https://script.google.com/macros/s/.../exec" required>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <button type="button" id="btn-sync-all-now" class="btn btn-secondary">🚀 Sync All Saved Leads Now</button>
@@ -571,12 +828,14 @@
       </div>
       <div>
         <div id="outreach-lead-info" style="margin-bottom:12px;"></div>
-        
+
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <label style="font-size:12px; font-weight:600; color:var(--text-secondary);">Outreach Pitch Message</label>
           <div style="display:flex; gap:6px;">
-            <button id="btn-pitch-lang-hi" class="btn btn-secondary btn-sm" style="padding:3px 8px; font-size:11px;">🇮🇳 Hinglish</button>
-            <button id="btn-pitch-lang-en" class="btn btn-ghost btn-sm" style="padding:3px 8px; font-size:11px;">🇬🇧 English</button>
+            <button id="btn-pitch-lang-hi" class="btn btn-secondary btn-sm"
+              style="padding:3px 8px; font-size:11px;">🇮🇳 Hinglish</button>
+            <button id="btn-pitch-lang-en" class="btn btn-ghost btn-sm" style="padding:3px 8px; font-size:11px;">🇬🇧
+              English</button>
           </div>
         </div>
 
@@ -631,11 +890,13 @@
         </div>
         <div class="form-group">
           <label>Bio Snippet (Optional)</label>
-          <textarea id="ig-manual-bio" class="form-control" rows="2" placeholder="e.g. DM for orders or WA +919811245890"></textarea>
+          <textarea id="ig-manual-bio" class="form-control" rows="2"
+            placeholder="e.g. DM for orders or WA +919811245890"></textarea>
         </div>
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
           <button type="button" id="btn-cancel-ig-manual" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #e1306c, #f77737); border:none;">💾 Save & Generate Pitch</button>
+          <button type="submit" class="btn btn-primary"
+            style="background:linear-gradient(135deg, #e1306c, #f77737); border:none;">💾 Save & Generate Pitch</button>
         </div>
       </form>
     </div>
@@ -643,4 +904,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
