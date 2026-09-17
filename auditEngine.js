@@ -62,6 +62,18 @@ export function saveLead(lead) {
   }
 }
 
+export function clearAllLeads() {
+  try {
+    fs.writeFileSync(LEADS_DB_PATH, JSON.stringify([], null, 2));
+    fs.writeFileSync(DATA_STORE_PATH, JSON.stringify({ processedIds: {} }, null, 2));
+    console.log('  🗑️ [LEADS CLEARED] Old database cleared. Fresh generation initiated.');
+    return { success: true };
+  } catch (err) {
+    console.error('Error clearing leads:', err);
+    return { success: false, error: err.message };
+  }
+}
+
 export function getSearchQueue() {
   try {
     return JSON.parse(fs.readFileSync(SEARCH_QUEUE_PATH, 'utf-8'));

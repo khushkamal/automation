@@ -640,6 +640,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Clear All Leads Handler
+  const btnClearAllLeads = document.getElementById('btn-clear-all-leads');
+  const btnClearIgLeads = document.getElementById('btn-clear-ig-leads');
+
+  async function handleClearLeads() {
+    if (!confirm('Are you sure you want to clear all leads? Next search will start with a fresh database.')) return;
+    try {
+      await fetch('/api/leads/clear', { method: 'POST' });
+      await fetchStats();
+      await fetchLeads();
+      await fetchInstagramLeads();
+    } catch (err) {
+      alert('Error clearing leads: ' + err.message);
+    }
+  }
+
+  if (btnClearAllLeads) {
+    btnClearAllLeads.addEventListener('click', handleClearLeads);
+  }
+  if (btnClearIgLeads) {
+    btnClearIgLeads.addEventListener('click', handleClearLeads);
+  }
+
   // 4.0. High-Ticket Niche Preset Click Handlers
   document.querySelectorAll('.btn-niche-preset').forEach(btn => {
     btn.addEventListener('click', () => {

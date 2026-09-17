@@ -9,7 +9,8 @@ import {
   getSavedLeads,
   getProcessedIds,
   getSearchQueue,
-  saveSearchQueue
+  saveSearchQueue,
+  clearAllLeads
 } from './auditEngine.js';
 import {
   generateRandomInstagramLeads,
@@ -25,6 +26,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Clear all saved leads & duplicate store on demand
+app.post('/api/leads/clear', (req, res) => {
+  res.json(clearAllLeads());
+});
 
 // 1. Get Search Queue
 app.get('/api/search-queue', (req, res) => {
@@ -46,7 +52,17 @@ app.post('/api/search-queue', (req, res) => {
     status: status || 'Ready',
     createdAt: new Date().toISOString()
   };
-  queue.push(newItem);
+
+  const existingIndex = queue.findIndex(
+    item => item.keyword === newItem.keyword && item.city.toLowerCase() === newItem.city.toLowerCase()
+  );
+
+  if (existingIndex >= 0) {
+    queue[existingIndex] = { ...queue[existingIndex], status: newItem.status };
+  } else {
+    queue.push(newItem);
+  }
+
   saveSearchQueue(queue);
   console.log(`[QUEUE] Added: "${newItem.keyword}" in ${newItem.city} (Status: ${newItem.status})`);
   res.json({ success: true, item: newItem });
@@ -61,15 +77,18 @@ app.delete('/api/search-queue/:id', (req, res) => {
   res.json({ success: true });
 });
 
-// 4. Run Audit for specific keyword & city
+// 4. Run Audit for specific keyword & city (Clears old data automatically for fresh generation)
 app.post('/api/run-audit', async (req, res) => {
   const { keyword, city, maxResults = 20 } = req.body;
   if (!keyword || !city) {
     return res.status(400).json({ error: 'Keyword and City are required' });
   }
 
+  // Clear previous data for fresh search generation
+  clearAllLeads();
+
   console.log(`\n--------------------------------------------------`);
-  console.log(`[AUDIT] Starting search: "${keyword}" in "${city}" (Max: ${maxResults})`);
+  console.log(`[AUDIT] Starting fresh search: "${keyword}" in "${city}" (Max: ${maxResults})`);
 
   try {
     const rawElements = await searchOverpass(keyword, city, maxResults);
@@ -110,7 +129,7 @@ app.post('/api/run-audit', async (req, res) => {
     });
     if (updated) saveSearchQueue(queue);
 
-    console.log(`[AUDIT COMPLETED] Qualified Leads Added: ${addedCount} | Skipped: ${skippedCount}\n`);
+    console.log(`[AUDIT COMPLETED] Fresh Qualified Leads Added: ${addedCount} | Skipped: ${skippedCount}\n`);
 
     res.json({
       success: true,
@@ -126,7 +145,7 @@ app.post('/api/run-audit', async (req, res) => {
   }
 });
 
-// 4.1. Run Random Worldwide Audit Endpoint
+// 4.1. Run Random Worldwide Audit Endpoint (Clears old data automatically)
 import { getRandomGlobalTarget } from './auditEngine.js';
 
 app.get('/api/random-suggestion', (req, res) => {
@@ -139,6 +158,9 @@ app.post('/api/run-random-audit', async (req, res) => {
   const { region = 'Worldwide', maxResults = 15 } = req.body;
   const target = getRandomGlobalTarget(region);
   
+  // Clear previous data for fresh search generation
+  clearAllLeads();
+
   console.log(`\n==================================================`);
   console.log(`[RANDOM WORLDWIDE] Picked Target: "${target.keyword}" in "${target.city}" (${target.region})`);
   console.log(`==================================================\n`);
@@ -183,11 +205,15 @@ app.post('/api/run-random-audit', async (req, res) => {
   }
 });
 
-// 4.2. Instagram Business Lead Discovery Endpoints
+// 4.2. Instagram Business Lead Discovery Endpoints (Clears old data automatically)
 app.post('/api/instagram/generate-random', async (req, res) => {
   const { count = 10 } = req.body;
+  
+  // Clear previous data for fresh Instagram generation
+  clearAllLeads();
+
   console.log(`\n==================================================`);
-  console.log(`[INSTAGRAM] Request to generate ${count} random qualified leads`);
+  console.log(`[INSTAGRAM] Request to generate fresh ${count} real live leads`);
   console.log(`==================================================\n`);
 
   try {
