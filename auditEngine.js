@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { syncLeadToGoogleSheet } from './googleSheetSync.js';
+import { isAlreadyContacted } from './contactRegistry.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -724,6 +725,16 @@ export async function processElement(elem, queueKeyword, queueCity) {
     return {
       skipped: true,
       reason: `Filtered: No valid contact/phone number available (${businessName})`,
+      leadId
+    };
+  }
+
+  // 3. Strict Anti-Duplicate Message Lock: NEVER add back anyone who was already messaged!
+  const contactedCheck = isAlreadyContacted(firstPhone, leadId);
+  if (contactedCheck.contacted) {
+    return {
+      skipped: true,
+      reason: `Already Messaged: Client was previously messaged by ${contactedCheck.contactedBy || 'Team'} on ${new Date(contactedCheck.contactedAt).toLocaleDateString()} (${businessName})`,
       leadId
     };
   }

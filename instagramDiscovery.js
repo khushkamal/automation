@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { saveLead, getSavedLeads, isIndianLocation } from './auditEngine.js';
 import { syncLeadToGoogleSheet } from './googleSheetSync.js';
+import { isAlreadyContacted } from './contactRegistry.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -228,6 +229,13 @@ export async function generateRandomInstagramLeads(count = 10) {
 
           const leadId = `ig:${handle}`;
           if (existingIds.has(leadId)) continue;
+
+          // Check if already messaged previously by any team member
+          const check = isAlreadyContacted(firstPhone, leadId);
+          if (check.contacted) {
+            console.log(`  🛡️ [SKIP ALREADY MESSAGED] ${name} (${firstPhone}) was messaged previously by ${check.contactedBy}`);
+            continue;
+          }
 
           const rawLead = {
             handle,
