@@ -949,21 +949,168 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearBulkNumbers = document.getElementById('btn-clear-bulk-numbers');
   const bulkNumbersCount = document.getElementById('bulk-numbers-count');
   const bulkTemplateSelect = document.getElementById('bulk-template-select');
+  const bulkLangSelect = document.getElementById('bulk-lang-select');
   const bulkCustomMessage = document.getElementById('bulk-custom-message');
   const bulkDispatchStatus = document.getElementById('bulk-dispatch-status');
   const btnSendBulkCustomAuto = document.getElementById('btn-send-bulk-custom-auto');
   const btnLaunchBulkWebQueue = document.getElementById('btn-launch-bulk-web-queue');
+  const bulkPreviewList = document.getElementById('bulk-preview-list');
+  const previewBadgeCount = document.getElementById('preview-badge-count');
+  const bulkTagBtns = document.querySelectorAll('.bulk-tag-btn');
 
   const pitchTemplates = {
-    'web-audit': `Namaste! 🙏\n\nMain aapke business ki online presence dekh raha tha. Humne aapke business ke liye ek Free Website & Digital Presence Audit prepare kiya hai jisse Google aur social media se direct customer inquiries 3x boost ho sakti hain.\n\nKya main aapke sath short 2-minute audit overview share karun?`,
-    'ig-store': `Hi! Loved your collection and products on Instagram. ✨\n\nAapke orders abhi manual DMs me process hote hain jisme kaafi time lagta hai. Hum aapke brand ke liye ek 1-Click WhatsApp Automated Storefront & Instant Catalog setup kar sakte hain jisse customer direct order place kar sakein.\n\nKya main aapke brand ke liye live demo share karun?`,
-    'speed-opt': `Hello! 🚀\n\nAapki website inspection me page loading speed aur mobile layout optimization ke opportunities detect huye hain. Fast loading websites se conversion rate 40% tak improve hota hai.\n\nHumne aapke liye ek quick optimization plan banaya hai. Kya hum connect kar sakte hain?`,
-    'custom': `Namaste! 🙏\n\nHum aapke business ke liye high-converting digital solutions aur website design offer karte hain. Kya hum short discussion kar sakte hain?`
+    'dynamic-req': `[🎯 AUTO-PERSONALIZED BY CLIENT REQUIREMENT]\n\nHar lead ko unki exact audit findings ke mutabiq pitch jayegi:\n• No Website -> High-Converting Website & Booking Setup Pitch\n• Missing SEO/WhatsApp -> Specific Missing Issues & Inquiry Boost Pitch\n• Instagram Brand -> 1-Click WhatsApp Catalog & Storefront Pitch\n• Well Optimized -> Google & Local Ads Traffic Scaling Pitch`,
+    'dynamic-vars': `Namaste {businessName}! 👋\n\nMaine {city} me aapke {category} business ki online presence audit ki. Isme {issue} optimize karke aap direct customer inquiries aur WhatsApp appointments 2x–3x boost kar sakte hain.\n\nHumne aapke liye ek short solution overview ready kiya hai. Kya hum ispar 2-min discuss kar sakte hain?`,
+    'web-audit': `Namaste {businessName}! 🙏\n\nMain {city} me aapke {category} business ki online presence dekh raha tha. Humne aapke business ke liye ek Free Website & Digital Presence Audit prepare kiya hai jisse Google aur local search se direct customer inquiries 3x boost ho sakti hain.\n\nKya main aapke sath short 2-minute audit overview share karun?`,
+    'ig-store': `Hi {businessName}! Loved your {category} collection on Instagram ✨\n\nAapke orders abhi manual DMs me process hote hain jisme kaafi time lagta hai. Hum aapke brand ke liye ek 1-Click WhatsApp Automated Storefront & Instant Catalog setup kar sakte hain jisse customer direct order place kar sakein.\n\nKya main aapke brand ke liye live demo share karun?`,
+    'speed-opt': `Hello {businessName}! 🚀\n\nAapki website {website} inspection me mobile layout aur conversion speed optimization ke opportunities detect huye hain. Fast loading websites se customer conversion 40% tak improve hota hai.\n\nHumne aapke liye ek quick optimization plan banaya hai. Kya hum connect kar sakte hain?`,
+    'custom': `Namaste! 🙏\n\nHum aapke business ke liye high-converting digital solutions aur website growth setup offer karte hain. Kya hum short discussion kar sakte hain?`
   };
+
+  // Helper to find lead info from memory for a given phone
+  function getLeadForPhone(phone) {
+    if (!phone) return null;
+    const clean = getCleanDigits(phone);
+    if (!clean) return null;
+    const last10 = clean.slice(-10);
+
+    // 1. Check in current active leads
+    const foundMaps = currentLeads.find(l => {
+      const p = getCleanDigits(l.phone);
+      return p && (p.endsWith(last10) || p === clean);
+    });
+    if (foundMaps) return foundMaps;
+
+    // 2. Check in current Instagram leads
+    const foundIg = currentInstagramLeads.find(l => {
+      const p = getCleanDigits(l.phone);
+      return p && (p.endsWith(last10) || p === clean);
+    });
+    if (foundIg) return foundIg;
+
+    return null;
+  }
+
+  // Client-side Personalized Pitch Generator
+  function generateClientSidePitch(lead, phone, templateType, templateText, lang) {
+    const isEnglish = lang === 'en' || (lang === 'auto' && lead?.isInternational);
+    const businessName = lead?.businessName || `Contact +${phone}`;
+    const category = lead?.category || 'business';
+    const city = lead?.city || 'your area';
+    const website = lead?.website || '';
+    const recommendedService = lead?.recommendedService || 'Digital Growth & WhatsApp Funnel Setup';
+    const auditReason = lead?.auditReason || 'Online Presence & Lead Funnel Optimization';
+    const isNoWeb = !website || lead?.websiteStatus === 'No Website';
+    const isInstagram = lead?.source === 'Instagram Discovery' || (lead?.leadId && String(lead.leadId).startsWith('ig:'));
+
+    // Mode 1: Auto Requirement Pitch
+    if (templateType === 'dynamic-req' || !templateType) {
+      if (lead) {
+        if (isEnglish && lead.outreachMessageEn) return lead.outreachMessageEn;
+        if (!isEnglish && lead.outreachMessageHi) return lead.outreachMessageHi;
+        if (lead.outreachMessage) return lead.outreachMessage;
+      }
+
+      if (isInstagram) {
+        return isEnglish
+          ? `Hi ${businessName}! 👋 Loved your Instagram profile and your ${category}! We help active Instagram brands set up 1-Click WhatsApp Storefronts & instant product catalogs so customers order 24/7. Would you be open to a quick 2-minute demo preview?`
+          : `Namaste ${businessName}! 👋 Maine aapka Instagram page dekha. Aapka ${category} collection bohot amazing hai! 🔥 Hum aapke brand ke liye 1-Click WhatsApp Automated Storefront setup karte hain jisse customers direct 24/7 order kar sakein. Kya main 2-min live preview share karun?`;
+      }
+
+      if (isNoWeb) {
+        return isEnglish
+          ? `Hi ${businessName}, noticed your ${category} practice in ${city} does not have an active website. High-intent clients actively search Google before booking high-value services. We build high-converting websites with instant appointment booking & WhatsApp inquiry funnels. Would you be open for a quick 2-min preview?`
+          : `Namaste ${businessName}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal high-value clients aur patients pehle Google pe verify karke hi appointment book karte hain. Hum aapke business ke liye ek premium website & instant WhatsApp booking system setup kar sakte hain. Kya hum ispar 2-min discuss kar sakte hain?`;
+      }
+
+      // Site exists with audit findings
+      return isEnglish
+        ? `Hi ${businessName}, I reviewed ${website || 'your website'} for your ${category} in ${city} and noticed potential improvements in ${auditReason}. Fixing these can boost your customer inquiries significantly. Can I share a quick 2-min overview?`
+        : `Namaste ${businessName}, maine ${city} me aapke ${category} business ki website ${website || ''} audit ki. Isme ${auditReason} optimize karke aap direct customer inquiries 2x se 3x boost kar sakte hain. Kya main short 2-minute overview share karun?`;
+    }
+
+    // Mode 2: Dynamic Template with Placeholders
+    let resolved = (templateText || pitchTemplates['dynamic-vars'] || '')
+      .replace(/\{businessName\}|\{name\}/gi, businessName)
+      .replace(/\{category\}|\{niche\}/gi, category)
+      .replace(/\{city\}|\{location\}/gi, city)
+      .replace(/\{requirement\}|\{service\}/gi, recommendedService)
+      .replace(/\{issue\}|\{auditReason\}/gi, auditReason)
+      .replace(/\{website\}/gi, website || (isNoWeb ? 'No Website listed' : 'your profile'))
+      .replace(/\{handle\}/gi, lead?.instagramHandle || businessName);
+
+    return resolved;
+  }
+
+  // Live Preview Renderer
+  function updateLiveBulkPreview() {
+    if (!bulkPreviewList) return;
+    const numbers = extractValidNumbersFromText(bulkCustomNumbers ? bulkCustomNumbers.value : '');
+    const templateType = bulkTemplateSelect ? bulkTemplateSelect.value : 'dynamic-req';
+    const templateText = bulkCustomMessage ? bulkCustomMessage.value : '';
+    const lang = bulkLangSelect ? bulkLangSelect.value : 'auto';
+
+    if (previewBadgeCount) {
+      previewBadgeCount.textContent = `${numbers.length} Recipient${numbers.length === 1 ? '' : 's'}`;
+    }
+
+    if (numbers.length === 0) {
+      bulkPreviewList.innerHTML = `
+        <div style="font-size:12px; color:var(--text-tertiary); text-align:center; padding:14px;">
+          Numbers enter karein ya "+ Load Leads" par click karein to see customized pitches for each client.
+        </div>
+      `;
+      return;
+    }
+
+    let previewHtml = '';
+    const displayLimit = Math.min(numbers.length, 12);
+
+    for (let i = 0; i < displayLimit; i++) {
+      const phone = numbers[i];
+      const lead = getLeadForPhone(phone);
+      const pitch = generateClientSidePitch(lead, phone, templateType, templateText, lang);
+
+      let reqBadge = `<span style="background:rgba(59,130,246,0.15); color:#60a5fa; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700;">🎯 Custom Growth Audit</span>`;
+      if (lead) {
+        if (lead.source === 'Instagram Discovery' || (lead.leadId && String(lead.leadId).startsWith('ig:'))) {
+          reqBadge = `<span style="background:rgba(168,85,247,0.15); color:#c084fc; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700;">🛍️ Instagram Storefront Pitch</span>`;
+        } else if (!lead.website || lead.websiteStatus === 'No Website') {
+          reqBadge = `<span style="background:rgba(239,68,68,0.15); color:#f87171; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700;">🔴 No Website Listed (Web Setup Pitch)</span>`;
+        } else if (lead.auditReason) {
+          reqBadge = `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700;">⚡ Audit: ${escapeHtml(lead.auditReason.substring(0, 35))}...</span>`;
+        }
+      }
+
+      previewHtml += `
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:11px; font-weight:800; color:var(--brand-orange); font-family:var(--font-mono);">#${i + 1} +${phone}</span>
+              <span style="font-size:12px; font-weight:700; color:var(--text-primary);">${escapeHtml(lead?.businessName || 'Business Lead')}</span>
+              ${lead?.city ? `<span style="font-size:11px; color:var(--text-tertiary);">(${escapeHtml(lead.city)})</span>` : ''}
+            </div>
+            <div>${reqBadge}</div>
+          </div>
+          <div style="font-size:11px; color:var(--text-secondary); line-height:1.45; background:rgba(0,0,0,0.2); padding:6px 10px; border-radius:4px; font-family:var(--font-mono); white-space:pre-wrap;">${escapeHtml(pitch)}</div>
+        </div>
+      `;
+    }
+
+    if (numbers.length > displayLimit) {
+      previewHtml += `
+        <div style="font-size:11px; color:var(--text-tertiary); text-align:center; padding:6px;">
+          ... and ${numbers.length - displayLimit} more leads will each receive their own customized pitch!
+        </div>
+      `;
+    }
+
+    bulkPreviewList.innerHTML = previewHtml;
+  }
 
   // Initialize default template message
   if (bulkCustomMessage) {
-    bulkCustomMessage.value = pitchTemplates['web-audit'];
+    bulkCustomMessage.value = pitchTemplates['dynamic-req'];
   }
 
   if (bulkTemplateSelect) {
@@ -972,8 +1119,35 @@ document.addEventListener('DOMContentLoaded', () => {
       if (bulkCustomMessage && pitchTemplates[selected]) {
         bulkCustomMessage.value = pitchTemplates[selected];
       }
+      updateLiveBulkPreview();
     });
   }
+
+  if (bulkLangSelect) {
+    bulkLangSelect.addEventListener('change', updateLiveBulkPreview);
+  }
+
+  // Dynamic Tag Click Handlers
+  bulkTagBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.getAttribute('data-tag');
+      if (!tag || !bulkCustomMessage) return;
+
+      // If in dynamic-req mode, switch to dynamic-vars so user can customize template
+      if (bulkTemplateSelect && bulkTemplateSelect.value === 'dynamic-req') {
+        bulkTemplateSelect.value = 'dynamic-vars';
+        bulkCustomMessage.value = pitchTemplates['dynamic-vars'];
+      }
+
+      const start = bulkCustomMessage.selectionStart || bulkCustomMessage.value.length;
+      const end = bulkCustomMessage.selectionEnd || bulkCustomMessage.value.length;
+      const text = bulkCustomMessage.value;
+      bulkCustomMessage.value = text.substring(0, start) + tag + text.substring(end);
+      bulkCustomMessage.focus();
+      bulkCustomMessage.selectionStart = bulkCustomMessage.selectionEnd = start + tag.length;
+      updateLiveBulkPreview();
+    });
+  });
 
   function extractValidNumbersFromText(text) {
     if (!text) return [];
@@ -993,10 +1167,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!bulkCustomNumbers || !bulkNumbersCount) return;
     const nums = extractValidNumbersFromText(bulkCustomNumbers.value);
     bulkNumbersCount.textContent = nums.length;
+    updateLiveBulkPreview();
   }
 
   if (bulkCustomNumbers) {
     bulkCustomNumbers.addEventListener('input', updateBulkNumbersCount);
+  }
+
+  if (bulkCustomMessage) {
+    bulkCustomMessage.addEventListener('input', updateLiveBulkPreview);
   }
 
   if (btnLoadIgNumbers) {
@@ -1019,9 +1198,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBulkNumbersCount();
       }
       if (bulkTemplateSelect) {
-        bulkTemplateSelect.value = 'ig-store';
-        bulkCustomMessage.value = pitchTemplates['ig-store'];
+        bulkTemplateSelect.value = 'dynamic-req';
+        bulkCustomMessage.value = pitchTemplates['dynamic-req'];
       }
+      updateLiveBulkPreview();
     });
   }
 
@@ -1045,9 +1225,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBulkNumbersCount();
       }
       if (bulkTemplateSelect) {
-        bulkTemplateSelect.value = 'web-audit';
-        bulkCustomMessage.value = pitchTemplates['web-audit'];
+        bulkTemplateSelect.value = 'dynamic-req';
+        bulkCustomMessage.value = pitchTemplates['dynamic-req'];
       }
+      updateLiveBulkPreview();
     });
   }
 
@@ -1058,15 +1239,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBulkNumbersCount();
       }
       if (bulkDispatchStatus) bulkDispatchStatus.textContent = '';
+      updateLiveBulkPreview();
     });
   }
 
-  // Auto Dispatcher to All Custom Numbers
+  // Auto Dispatcher to All Custom Numbers with Requirement Personalization
   if (btnSendBulkCustomAuto) {
     btnSendBulkCustomAuto.addEventListener('click', async () => {
       const numbers = extractValidNumbersFromText(bulkCustomNumbers ? bulkCustomNumbers.value : '');
-      const message = bulkCustomMessage ? bulkCustomMessage.value.trim() : '';
+      const templateType = bulkTemplateSelect ? bulkTemplateSelect.value : 'dynamic-req';
+      const rawMessage = bulkCustomMessage ? bulkCustomMessage.value.trim() : '';
+      const message = templateType === 'dynamic-req' ? 'dynamic-req' : rawMessage;
       const memberName = inputMemberName ? inputMemberName.value.trim() : 'Team Member';
+      const lang = bulkLangSelect ? bulkLangSelect.value : 'auto';
 
       if (numbers.length === 0) {
         alert('Please enter or load at least one phone number in the box above.');
@@ -1079,28 +1264,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
       btnSendBulkCustomAuto.disabled = true;
       if (bulkDispatchStatus) {
-        bulkDispatchStatus.textContent = `⏳ Dispatching bulk message to ${numbers.length} numbers in background...`;
+        bulkDispatchStatus.textContent = `⏳ Dispatching requirement-tailored pitches to ${numbers.length} leads in background...`;
         bulkDispatchStatus.style.color = '#3b82f6';
       }
 
       try {
+        const allLoadedLeads = [...currentLeads, ...currentInstagramLeads];
         const res = await fetch('/api/whatsapp/send-bulk-custom', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ numbers, message, memberName })
+          body: JSON.stringify({
+            numbers,
+            message,
+            memberName,
+            lang,
+            leadsData: allLoadedLeads
+          })
         });
         const data = await res.json();
 
         if (data.success) {
           if (bulkDispatchStatus) {
-            bulkDispatchStatus.textContent = `✅ Bulk Completed! Successfully sent to ${data.sent} of ${data.total} numbers.`;
+            const skippedText = data.skipped > 0 ? ` (${data.skipped} duplicates skipped)` : '';
+            bulkDispatchStatus.textContent = `✅ Bulk Completed! Successfully sent requirement pitches to ${data.sent} of ${data.total} leads${skippedText}.`;
             bulkDispatchStatus.style.color = '#10b981';
           }
           await fetchStats();
         } else {
           // If server messaging failed, offer 1-click web queue
           if (bulkDispatchStatus) {
-            bulkDispatchStatus.textContent = `⚠️ Server Dispatch Notice: ${data.error || 'Failed'}. Use "1-Click Rapid Web Queue" button.`;
+            bulkDispatchStatus.textContent = `⚠️ Server Notice: ${data.error || 'Failed'}. Use "1-Click Rapid Web Queue" button.`;
             bulkDispatchStatus.style.color = '#f59e0b';
           }
         }
@@ -1115,21 +1308,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 1-Click Rapid Web Queue (Zero-Config browser sequence)
+  // 1-Click Rapid Web Queue (Zero-Config browser sequence with Requirement Personalization)
   let bulkQueueIndex = 0;
   let bulkQueueNumbers = [];
 
   if (btnLaunchBulkWebQueue) {
     btnLaunchBulkWebQueue.addEventListener('click', () => {
       bulkQueueNumbers = extractValidNumbersFromText(bulkCustomNumbers ? bulkCustomNumbers.value : '');
-      const message = bulkCustomMessage ? bulkCustomMessage.value.trim() : '';
+      const templateType = bulkTemplateSelect ? bulkTemplateSelect.value : 'dynamic-req';
+      const templateText = bulkCustomMessage ? bulkCustomMessage.value.trim() : '';
+      const lang = bulkLangSelect ? bulkLangSelect.value : 'auto';
 
       if (bulkQueueNumbers.length === 0) {
         alert('Please enter or load at least one phone number in the box above.');
-        return;
-      }
-      if (!message) {
-        alert('Pitch message cannot be empty.');
         return;
       }
 
@@ -1138,12 +1329,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const currentNum = bulkQueueNumbers[bulkQueueIndex];
-      const directUrl = `https://wa.me/${currentNum}?text=${encodeURIComponent(message)}`;
+      const lead = getLeadForPhone(currentNum);
+      const personalizedPitch = generateClientSidePitch(lead, currentNum, templateType, templateText, lang);
+
+      const directUrl = `https://wa.me/${currentNum}?text=${encodeURIComponent(personalizedPitch)}`;
       window.open(directUrl, '_blank');
 
       bulkQueueIndex++;
+      const targetName = lead ? lead.businessName : `+${currentNum}`;
+      const targetReq = lead?.recommendedService || 'Custom Growth Audit';
+
       if (bulkDispatchStatus) {
-        bulkDispatchStatus.innerHTML = `💬 Opened WhatsApp for <strong>+${currentNum}</strong> (${bulkQueueIndex}/${bulkQueueNumbers.length}). Click again to open next!`;
+        bulkDispatchStatus.innerHTML = `💬 Opened WhatsApp for <strong>${escapeHtml(targetName)}</strong> (+${currentNum}) with requirement: <em>${escapeHtml(targetReq)}</em> (${bulkQueueIndex}/${bulkQueueNumbers.length}). Click again to open next!`;
         bulkDispatchStatus.style.color = '#059669';
       }
 
@@ -1159,16 +1356,24 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnStartWaCampaign) {
     btnStartWaCampaign.addEventListener('click', async () => {
       const memberName = inputMemberName ? inputMemberName.value.trim() : 'Team Member';
+      const templateType = bulkTemplateSelect ? bulkTemplateSelect.value : 'dynamic-req';
+      const templateText = bulkCustomMessage ? bulkCustomMessage.value.trim() : '';
+      const lang = bulkLangSelect ? bulkLangSelect.value : 'auto';
+
       btnStartWaCampaign.disabled = true;
       try {
         const res = await fetch('/api/whatsapp/start-campaign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ memberName })
+          body: JSON.stringify({
+            memberName,
+            template: templateType === 'dynamic-req' ? 'dynamic-req' : templateText,
+            lang
+          })
         });
         const data = await res.json();
         if (data.success) {
-          alert(`🚀 Campaign launched by ${memberName}! Sending audit pitch to ${data.totalTargets || 'unsent'} qualified leads in background. (Any lead already contacted by other team members is automatically skipped)`);
+          alert(`🚀 Campaign launched by ${memberName}! Sending requirement-tailored pitches to ${data.totalTargets || 'unsent'} qualified leads in background. (Any lead already contacted is automatically skipped)`);
         } else {
           alert(`Notice: ${data.error || 'No unsent leads available'}`);
         }

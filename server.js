@@ -468,7 +468,9 @@ import {
   startWhatsAppCampaign,
   stopWhatsAppCampaign,
   logoutWhatsApp,
-  sendBulkCustomWhatsAppMessages
+  sendBulkCustomWhatsAppMessages,
+  generateLeadSpecificPitch,
+  findLeadByPhone
 } from './whatsappService.js';
 
 app.get('/api/whatsapp/status', (req, res) => {
@@ -493,13 +495,42 @@ app.post('/api/whatsapp/send-single', async (req, res) => {
   }
 });
 
+// Preview personalized pitches for multiple phone numbers / leads before sending
+app.post('/api/whatsapp/preview-bulk', (req, res) => {
+  const { numbers = [], message = 'dynamic-req', lang = 'auto', leadsData = [] } = req.body;
+  try {
+    const previews = numbers.map(phone => {
+      const lead = findLeadByPhone(phone, leadsData);
+      const personalizedPitch = generateLeadSpecificPitch(lead, { template: message, lang });
+      return {
+        phone,
+        leadId: lead?.leadId || null,
+        businessName: lead?.businessName || `Contact +${phone}`,
+        category: lead?.category || 'business',
+        city: lead?.city || '',
+        requirement: lead?.recommendedService || 'Custom Growth Funnel',
+        auditReason: lead?.auditReason || 'Online Lead Optimization',
+        pitch: personalizedPitch
+      };
+    });
+    res.json({ success: true, previews });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/whatsapp/send-bulk-custom', async (req, res) => {
-  const { numbers, message, memberName } = req.body;
-  if (!numbers || !message) {
-    return res.status(400).json({ error: 'Phone numbers list and Message are required' });
+  const { numbers, message, memberName, lang, leadsData } = req.body;
+  if (!numbers || !Array.isArray(numbers) || numbers.length === 0) {
+    return res.status(400).json({ error: 'Phone numbers list is required' });
   }
   try {
-    const result = await sendBulkCustomWhatsAppMessages(numbers, message, memberName || 'Team Member');
+    const result = await sendBulkCustomWhatsAppMessages(
+      numbers,
+      message || 'dynamic-req',
+      memberName || 'Team Member',
+      { lang: lang || 'auto', leadsData: leadsData || [] }
+    );
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -507,9 +538,12 @@ app.post('/api/whatsapp/send-bulk-custom', async (req, res) => {
 });
 
 app.post('/api/whatsapp/start-campaign', async (req, res) => {
-  const { memberName } = req.body;
+  const { memberName, template, lang } = req.body;
   try {
-    const result = await startWhatsAppCampaign(memberName || 'Team Member');
+    const result = await startWhatsAppCampaign(memberName || 'Team Member', {
+      template: template || 'dynamic-req',
+      lang: lang || 'auto'
+    });
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });

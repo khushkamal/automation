@@ -599,12 +599,12 @@
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
               <div>
                 <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.3); border-radius:20px; padding:4px 12px; margin-bottom:6px;">
-                  <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">🚀 1-CLICK CUSTOM NUMBER BULK SENDER</span>
-                  <span style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Paste Any Numbers</span>
+                  <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">🚀 1-CLICK REQUIREMENT-BASED BULK SENDER</span>
+                  <span style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Smart Personalization</span>
                 </div>
-                <h3 style="font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">Custom Numbers & Requirement Bulk Outreach</h3>
-                <p style="font-size:13px; color:var(--text-secondary);">
-                  Paste any custom phone numbers or 1-click load leads, select the client requirement template, and blast pitches automatically.
+                <h3 style="font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">Requirement-Based Bulk WhatsApp Outreach</h3>
+                <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+                  Har client ko unki exact requirement ke mutabiq alag message jayega (No Website vs Missing SEO/WhatsApp vs Instagram D2C Store). Same message kisi ko nahi jayega.
                 </p>
               </div>
             </div>
@@ -615,7 +615,7 @@
                 <label for="bulk-custom-numbers" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
                   Enter / Paste Phone Numbers (Comma, space, or new line separated):
                 </label>
-                <div style="display:flex; gap:6px;">
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
                   <button type="button" id="btn-load-ig-numbers" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 9px;">
                     📸 + Load Instagram Leads
                   </button>
@@ -630,33 +630,76 @@
 
               <textarea id="bulk-custom-numbers" class="form-control" rows="3" placeholder="e.g. 9811223344, 9876543210, +91 9123456789 (Or click buttons above to auto-load leads)" style="font-family:var(--font-mono); font-size:12px;"></textarea>
               
-              <div style="font-size:11px; color:var(--text-tertiary); font-weight:600;">
-                Detected: <span id="bulk-numbers-count" style="color:var(--brand-orange-dark); font-weight:800;">0</span> valid numbers ready to message.
-              </div>
-
-              <!-- Pitch Message & Template Selector -->
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:4px;">
-                <label for="bulk-custom-message" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
-                  Pitch Message (Client Requirement Template):
-                </label>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="font-size:11px; color:var(--text-tertiary);">Select Requirement:</span>
-                  <select id="bulk-template-select" class="form-control" style="font-size:11px; padding:3px 8px; height:auto; width:auto; font-weight:600;">
-                    <option value="web-audit">🌐 High-Converting Website Pitch (No Website / Redesign)</option>
-                    <option value="ig-store">🛍️ Instagram WhatsApp Storefront & Catalog Pitch</option>
-                    <option value="speed-opt">⚡ Fast Speed & Mobile Optimization Pitch</option>
-                    <option value="custom">✏️ Custom Requirement Pitch</option>
-                  </select>
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:var(--text-tertiary); font-weight:600;">
+                <div>
+                  Detected: <span id="bulk-numbers-count" style="color:var(--brand-orange-dark); font-weight:800;">0</span> valid numbers ready to message.
+                </div>
+                <div style="color:var(--brand-emerald); font-weight:700;">
+                  ⚡ Auto-Personalization Active: Har recipient ka audit analyze karke message generate hoga
                 </div>
               </div>
 
+              <!-- Pitch Message & Template Selector & Language Options -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:6px;">
+                <label for="bulk-custom-message" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
+                  Pitch Template & Requirement Strategy:
+                </label>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:11px; color:var(--text-tertiary);">Language:</span>
+                    <select id="bulk-lang-select" class="form-control" style="font-size:11px; padding:3px 8px; height:auto; width:auto; font-weight:600;">
+                      <option value="auto">🌐 Auto (Hinglish / En)</option>
+                      <option value="hi">🇮🇳 Hinglish / Hindi</option>
+                      <option value="en">🇬🇧 English</option>
+                    </select>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:11px; color:var(--text-tertiary);">Strategy:</span>
+                    <select id="bulk-template-select" class="form-control" style="font-size:11px; padding:3px 8px; height:auto; width:auto; font-weight:700; color:var(--brand-emerald);">
+                      <option value="dynamic-req" selected>🎯 Auto Requirement-Based Pitch (Customized per Lead)</option>
+                      <option value="dynamic-vars">✨ Dynamic Template (Placeholders: {businessName}, {requirement}...)</option>
+                      <option value="web-audit">🌐 Website & Growth Funnel Pitch</option>
+                      <option value="ig-store">🛍️ Instagram WhatsApp Storefront Pitch</option>
+                      <option value="speed-opt">⚡ Speed & Mobile Optimization Pitch</option>
+                      <option value="custom">✏️ Plain Custom Pitch</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dynamic Variable Chips Bar -->
+              <div id="bulk-tags-container" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; background:rgba(255,255,255,0.03); border:1px dashed var(--border-subtle); border-radius:var(--radius-sm); padding:6px 10px;">
+                <span style="font-size:11px; font-weight:700; color:var(--text-secondary);">Click to Insert Dynamic Tag:</span>
+                <button type="button" class="btn btn-secondary btn-sm bulk-tag-btn" data-tag="{businessName}" style="font-size:10px; padding:2px 8px; font-family:var(--font-mono);">{businessName}</button>
+                <button type="button" class="btn btn-secondary btn-sm bulk-tag-btn" data-tag="{category}" style="font-size:10px; padding:2px 8px; font-family:var(--font-mono);">{category}</button>
+                <button type="button" class="btn btn-secondary btn-sm bulk-tag-btn" data-tag="{city}" style="font-size:10px; padding:2px 8px; font-family:var(--font-mono);">{city}</button>
+                <button type="button" class="btn btn-secondary btn-sm bulk-tag-btn" data-tag="{requirement}" style="font-size:10px; padding:2px 8px; font-family:var(--font-mono);">{requirement}</button>
+                <button type="button" class="btn btn-secondary btn-sm bulk-tag-btn" data-tag="{issue}" style="font-size:10px; padding:2px 8px; font-family:var(--font-mono);">{issue}</button>
+                <button type="button" class="btn btn-secondary btn-sm bulk-tag-btn" data-tag="{website}" style="font-size:10px; padding:2px 8px; font-family:var(--font-mono);">{website}</button>
+              </div>
+
               <textarea id="bulk-custom-message" class="pitch-textarea" rows="4"></textarea>
+
+              <!-- LIVE PERSONALIZED PREVIEW CONTAINER -->
+              <div id="bulk-preview-wrapper" style="margin-top:4px; background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-size:12px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                    👁️ Live Requirement Pitch Preview <span id="preview-badge-count" style="background:rgba(59,130,246,0.2); color:#60a5fa; padding:1px 7px; border-radius:10px; font-size:10px;">0 Leads</span>
+                  </span>
+                  <span style="font-size:11px; color:var(--text-tertiary);">Har recipient ka personalized message neeche dekhein:</span>
+                </div>
+                <div id="bulk-preview-list" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px;">
+                  <div style="font-size:12px; color:var(--text-tertiary); text-align:center; padding:14px;">
+                    Numbers enter karein ya "+ Load Leads" par click karein to see customized pitches for each client.
+                  </div>
+                </div>
+              </div>
 
               <!-- Dispatch Action Buttons -->
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:6px;">
                 <div id="bulk-dispatch-status" style="font-size:12px; font-weight:600;"></div>
 
-                <div style="display:flex; gap:10px;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
                   <button type="button" id="btn-launch-bulk-web-queue" class="btn btn-secondary" style="font-weight:700; height:42px;">
                     💬 1-Click Rapid Web Queue
                   </button>

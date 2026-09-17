@@ -3,24 +3,35 @@
     "id": "1",
     "keyword": "dentist",
     "city": "Mumbai",
-    "status": "Completed",
-    "createdAt": "2026-09-14T11:21:01.962Z",
-    "lastRun": "2026-09-14T11:21:28.777Z"
+    "status": "Ready",
+    "createdAt": "2026-09-17T15:16:00.000Z"
   },
   {
     "id": "2",
-    "keyword": "restaurant",
+    "keyword": "cosmetic clinic",
     "city": "Delhi",
-    "status": "Completed",
-    "createdAt": "2026-09-14T11:21:01.963Z",
-    "lastRun": "2026-09-14T11:33:38.080Z"
+    "status": "Ready",
+    "createdAt": "2026-09-17T15:16:00.000Z"
   },
   {
     "id": "3",
-    "keyword": "salon",
+    "keyword": "interior designer",
     "city": "Bangalore",
-    "status": "Completed",
-    "createdAt": "2026-09-14T11:21:01.963Z",
-    "lastRun": "2026-09-14T11:34:07.924Z"
+    "status": "Ready",
+    "createdAt": "2026-09-17T15:16:00.000Z"
+  },
+  {
+    "id": "4",
+    "keyword": "hotel",
+    "city": "Jaipur",
+    "status": "Ready",
+    "createdAt": "2026-09-17T15:16:00.000Z"
+  },
+  {
+    "id": "5",
+    "keyword": "car detailing",
+    "city": "Delhi",
+    "status": "Ready",
+    "createdAt": "2026-09-17T15:16:00.000Z"
   }
 ]

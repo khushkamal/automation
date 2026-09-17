@@ -347,64 +347,21 @@ export function buildInstagramLeadRecord(rawLead) {
 }
 
 // 6. Generate Random Qualified Instagram Leads (No Category/City input required!)
+// 6. Discover Qualified Instagram Leads (From real submissions / verified directory)
 export async function generateRandomInstagramLeads(count = 10) {
-  console.log(`\n[INSTAGRAM DISCOVERY] Generating ${count} random qualified Instagram business leads...`);
+  console.log(`\n[INSTAGRAM DISCOVERY] Fetching real qualified Instagram business leads...`);
   
-  // Shuffle verified pool
-  const shuffledPool = [...VERIFIED_INSTAGRAM_LEADS_POOL].sort(() => 0.5 - Math.random());
-  
-  // Generate a dynamic batch using rotating niches and cities if more count is requested
   const leadsToProcess = [];
   const existingSaved = getSavedLeads();
   const existingIds = new Set(existingSaved.map(l => l.leadId));
 
-  // 1. First add from verified diverse pool
-  for (const item of shuffledPool) {
+  // Add from real verified business pool only (Strictly NO synthetic/fake numbers)
+  for (const item of VERIFIED_INSTAGRAM_LEADS_POOL) {
     const leadId = `ig:${item.handle.replace(/^@/, '')}`;
     if (!existingIds.has(leadId) && leadsToProcess.length < count) {
       leadsToProcess.push(item);
       existingIds.add(leadId);
     }
-  }
-
-  // 2. If more leads needed, generate dynamic high-converting Instagram variations
-  const dynamicNiches = [...INSTAGRAM_NICHES].sort(() => 0.5 - Math.random());
-  const dynamicCities = [...COMMERCE_HUBS].sort(() => 0.5 - Math.random());
-  
-  let i = 0;
-  while (leadsToProcess.length < count) {
-    const niche = dynamicNiches[i % dynamicNiches.length];
-    const city = dynamicCities[i % dynamicCities.length];
-    const brandPrefixes = ['Aura', 'Studio', 'The', 'Urban', 'Pure', 'Vogue', 'Luxe', 'Craft', 'Bloom', 'Grace', 'Chic'];
-    const brandSuffixes = ['Creations', 'Closet', 'Couture', 'Boutique', 'Treasures', 'Bakery', 'Jewels', 'Studio', 'Handmade'];
-    
-    const prefix = brandPrefixes[Math.floor(Math.random() * brandPrefixes.length)];
-    const suffix = brandSuffixes[Math.floor(Math.random() * brandSuffixes.length)];
-    const randomNum = Math.floor(10 + Math.random() * 89);
-    const handleName = `${prefix.toLowerCase()}_${suffix.toLowerCase()}${randomNum}`;
-    const businessName = `${prefix} ${suffix}`;
-    
-    // Generate clean Indian mobile number
-    const startDigit = ['9', '8', '7', '6'][Math.floor(Math.random() * 4)];
-    const midDigits = Math.floor(1000 + Math.random() * 8999);
-    const endDigits = Math.floor(10000 + Math.random() * 89999);
-    const phone = `+91 ${startDigit}${midDigits} ${endDigits}`;
-
-    const syntheticLead = {
-      handle: handleName,
-      businessName,
-      category: niche.category,
-      city,
-      phone,
-      bio: `Handcrafted ${niche.keywords[0]} & ${niche.keywords[1]} ✨ Based in ${city} | DM for orders or WA: ${phone} | Pan-India Shipping 📦`
-    };
-
-    const leadId = `ig:${handleName}`;
-    if (!existingIds.has(leadId)) {
-      leadsToProcess.push(syntheticLead);
-      existingIds.add(leadId);
-    }
-    i++;
   }
 
   const generatedLeads = [];
@@ -417,7 +374,7 @@ export async function generateRandomInstagramLeads(count = 10) {
     console.log(`  📸 [IG LEAD QUALIFIED] ${leadRecord.businessName} (${leadRecord.instagramHandle}) | ${leadRecord.category} in ${leadRecord.city} | Phone: ${leadRecord.phone}`);
   }
 
-  console.log(`[INSTAGRAM DISCOVERY] Successfully generated & saved ${generatedLeads.length} Instagram business leads!`);
+  console.log(`[INSTAGRAM DISCOVERY] Successfully verified & saved ${generatedLeads.length} real Instagram business leads!`);
   return generatedLeads;
 }
 

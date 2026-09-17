@@ -169,6 +169,117 @@ export async function sendWhatsAppMessage(phone, message, leadId = null, memberN
 }
 
 // ================================================================
+// Helper: Find lead from database or memory by phone number
+// ================================================================
+export function findLeadByPhone(phone, customLeads = []) {
+  if (!phone) return null;
+  const clean = String(phone).replace(/[^0-9]/g, '');
+  if (!clean || clean.length < 8) return null;
+  const last10 = clean.slice(-10);
+
+  // 1. Check in custom leads passed in options
+  if (Array.isArray(customLeads) && customLeads.length > 0) {
+    const found = customLeads.find(l => {
+      const p = l.phone ? String(l.phone).replace(/[^0-9]/g, '') : '';
+      return p.endsWith(last10) || p === clean;
+    });
+    if (found) return found;
+  }
+
+  // 2. Check in main leads database
+  try {
+    const allLeads = getSavedLeads();
+    const found = allLeads.find(l => {
+      const p = l.phone ? String(l.phone).replace(/[^0-9]/g, '') : '';
+      return p.endsWith(last10) || p === clean;
+    });
+    if (found) return found;
+  } catch (err) {
+    console.warn('[FIND LEAD ERROR]', err.message);
+  }
+
+  return null;
+}
+
+// ================================================================
+// Dynamic Requirement Pitch Generator
+// Generates unique, requirement-specific messages for every lead
+// ================================================================
+export function generateLeadSpecificPitch(lead = null, options = {}) {
+  const template = options.template || 'dynamic-req';
+  const lang = options.lang || 'auto'; // 'auto' | 'hi' | 'en'
+
+  // If lead is not provided or just a phone string
+  if (!lead || typeof lead !== 'object') {
+    if (template && template !== 'dynamic-req' && template !== 'AUTO_REQUIREMENT') {
+      return template
+        .replace(/\{businessName\}|\{name\}/gi, 'Business Owner')
+        .replace(/\{category\}|\{niche\}/gi, 'business')
+        .replace(/\{city\}|\{location\}/gi, 'your area')
+        .replace(/\{requirement\}|\{service\}/gi, 'Website & Growth Funnel')
+        .replace(/\{issue\}|\{auditReason\}/gi, 'Online presence optimization')
+        .replace(/\{website\}/gi, 'your profile')
+        .replace(/\{handle\}/gi, '');
+    }
+    return lang === 'en'
+      ? `Hi! We reviewed your local business profile and prepared a custom website & WhatsApp growth audit to help you scale customer inquiries. Would you be open for a quick 2-minute overview?`
+      : `Namaste! Humne aapke business profile ke liye ek custom website & WhatsApp lead generation audit review kiya hai. Kya hum ispar short 2-minute discuss kar sakte hain?`;
+  }
+
+  const businessName = lead.businessName || 'Sir/Ma\'am';
+  const category = lead.category || 'business';
+  const city = lead.city || 'your city';
+  const website = lead.website || '';
+  const recommendedService = lead.recommendedService || 'Digital Growth & WhatsApp Funnel Setup';
+  const auditReason = lead.auditReason || 'Online Lead Conversion Optimization';
+  const isNoWeb = !website || lead.websiteStatus === 'No Website';
+  const isInstagram = lead.source === 'Instagram Discovery' || (lead.leadId && String(lead.leadId).startsWith('ig:'));
+  const isEnglish = lang === 'en' || (lang === 'auto' && lead.isInternational);
+
+  // If template is set to auto dynamic requirement mode
+  if (!template || template === 'dynamic-req' || template === 'AUTO_REQUIREMENT') {
+    // If pre-computed messages exist on the lead
+    if (isEnglish && lead.outreachMessageEn) return lead.outreachMessageEn;
+    if (!isEnglish && lead.outreachMessageHi) return lead.outreachMessageHi;
+    if (lead.outreachMessage) return lead.outreachMessage;
+
+    // Generate requirement-tailored message based on audit status
+    if (isInstagram) {
+      const handle = lead.instagramHandle ? lead.instagramHandle.replace('@', '') : businessName;
+      if (isEnglish) {
+        return `Hi ${businessName}! 👋 Loved your Instagram profile (@${handle}) and your ${category}! We help active Instagram brands set up 1-Click WhatsApp Storefronts & instant product catalogs so customers order 24/7 without manual DM delays. Would you be open to a quick 2-minute demo preview?`;
+      }
+      return `Namaste ${businessName}! 👋 Maine aapka Instagram page dekha (@${handle}). Aapka ${category} collection bohot amazing hai! 🔥 Lekin customer inquiries aur orders DMs me manually handle karne me kaafi time lagta hai. Hum aapke brand ke liye 1-Click WhatsApp Automated Storefront setup karte hain jisse customers direct 24/7 order place kar sakein. Kya main aapke sath 2-min ka demo preview share karun?`;
+    }
+
+    if (isNoWeb) {
+      if (isEnglish) {
+        return `Hi ${businessName}, noticed your ${category} practice in ${city} does not have an active website. High-intent clients actively search Google before booking high-value services. We build high-converting websites with instant appointment booking & WhatsApp inquiry funnels. Would you be open for a quick 2-min preview?`;
+      }
+      return `Namaste ${businessName}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal high-value clients aur patients pehle Google pe verify karke hi appointment book karte hain. Hum aapke business ke liye ek premium website & instant WhatsApp booking system setup kar sakte hain. Kya hum ispar 2-min discuss kar sakte hain?`;
+    }
+
+    // Website exists with audit findings
+    if (isEnglish) {
+      return `Hi ${businessName}, I reviewed ${website} for your ${category} in ${city} and noticed potential improvements in ${auditReason}. Fixing these can boost your customer inquiries significantly. Can I share a quick 2-min overview?`;
+    }
+    return `Namaste ${businessName}, maine ${city} me aapke ${category} business ki website ${website} audit ki. Isme ${auditReason} optimize karke aap direct customer inquiries 2x se 3x boost kar sakte hain. Kya main short 2-minute overview share karun?`;
+  }
+
+  // Custom template with dynamic variables replacement
+  let resolved = template
+    .replace(/\{businessName\}|\{name\}/gi, businessName)
+    .replace(/\{category\}|\{niche\}/gi, category)
+    .replace(/\{city\}|\{location\}/gi, city)
+    .replace(/\{requirement\}|\{service\}/gi, recommendedService)
+    .replace(/\{issue\}|\{auditReason\}/gi, auditReason)
+    .replace(/\{website\}/gi, website || (isNoWeb ? 'No Website' : 'your profile'))
+    .replace(/\{handle\}/gi, lead.instagramHandle || businessName);
+
+  return resolved;
+}
+
+// ================================================================
 // 2. 1-CLICK CAMPAIGN DISPATCHER (BASED ON CLIENT AUDIT REQUIREMENTS)
 // ================================================================
 
@@ -207,7 +318,7 @@ export async function startWhatsAppCampaign(memberName = 'Team Member', options 
 
   // Run automated campaign in background
   (async () => {
-    console.log(`\n[WHATSAPP CAMPAIGN] Starting automated sending by ${memberName} to ${targetLeads.length} leads...`);
+    console.log(`\n[WHATSAPP CAMPAIGN] Starting requirement-based automated sending by ${memberName} to ${targetLeads.length} leads...`);
     
     for (const lead of targetLeads) {
       if (!isCampaignRunning) break;
@@ -221,10 +332,14 @@ export async function startWhatsAppCampaign(memberName = 'Team Member', options 
 
       campaignProgress.current = `${lead.businessName} (${lead.phone})`;
       try {
-        console.log(`[WHATSAPP] Sending requirement-based pitch to ${lead.businessName} (${lead.phone}) by ${memberName}...`);
-        
         const jid = formatPhoneNumber(lead.phone);
-        const pitchText = lead.outreachMessage || `Namaste! Humne aapke business "${lead.businessName}" ke liye ek custom website & online growth audit ready kiya hai.`;
+        // Build lead-specific personalized pitch according to audit findings
+        const pitchText = generateLeadSpecificPitch(lead, {
+          template: options.template || 'dynamic-req',
+          lang: options.lang || 'auto'
+        });
+        
+        console.log(`[WHATSAPP CAMPAIGN] Pitching tailored requirement [${lead.recommendedService || 'Custom Audit'}] to ${lead.businessName} (${lead.phone})...`);
         
         await sock.sendMessage(jid, { text: pitchText });
         markAsContacted(lead.phone, lead.leadId, memberName, pitchText);
@@ -259,20 +374,17 @@ export async function startWhatsAppCampaign(memberName = 'Team Member', options 
     console.log(`\n[WHATSAPP CAMPAIGN] Finished! Sent: ${campaignProgress.sent}, Failed: ${campaignProgress.failed}\n`);
   })();
 
-  return { success: true, message: `Campaign started by ${memberName} in background`, totalTargets: targetLeads.length };
+  return { success: true, message: `Requirement-based campaign started by ${memberName} in background`, totalTargets: targetLeads.length };
 }
 
-// Bulk Send to Custom List of Phone Numbers with Selected Pitch Template
-export async function sendBulkCustomWhatsAppMessages(numbersList = [], messageText = '', memberName = 'Team Member') {
+// Bulk Send to Custom List of Phone Numbers with Requirement Personalization
+export async function sendBulkCustomWhatsAppMessages(numbersList = [], messageText = '', memberName = 'Team Member', options = {}) {
   if (connectionStatus !== 'CONNECTED' || !sock) {
     throw new Error('WhatsApp is not connected. Please scan the QR code on Dashboard first.');
   }
 
   if (!numbersList || numbersList.length === 0) {
     throw new Error('Please provide at least one phone number.');
-  }
-  if (!messageText || !messageText.trim()) {
-    throw new Error('Message text cannot be empty.');
   }
 
   const validNumbers = [];
@@ -287,29 +399,80 @@ export async function sendBulkCustomWhatsAppMessages(numbersList = [], messageTe
     throw new Error('No valid phone numbers found in the provided list.');
   }
 
-  console.log(`\n[WHATSAPP BULK CUSTOM] Dispatching requirement pitch to ${validNumbers.length} numbers by ${memberName}...`);
+  console.log(`\n[WHATSAPP BULK DISPATCH] Preparing personalized requirement pitches for ${validNumbers.length} numbers by ${memberName}...`);
 
   let sentCount = 0;
   let failedCount = 0;
+  let skippedCount = 0;
   const dispatchReport = [];
 
   for (const phone of validNumbers) {
     try {
+      // Find lead details for this phone number
+      const lead = findLeadByPhone(phone, options.leadsData || []);
+      const leadId = lead ? lead.leadId : null;
+      const businessName = lead ? lead.businessName : `Contact +${phone}`;
+
+      // Check anti-collision lock
+      const check = isAlreadyContacted(phone, leadId);
+      if (check.contacted) {
+        skippedCount++;
+        dispatchReport.push({
+          phone,
+          businessName,
+          status: 'SKIPPED_DUPLICATE',
+          message: `Already messaged by ${check.contactedBy || 'team'}`
+        });
+        console.log(`  🛡️ [DUPLICATE BLOCKED] +${phone} (${businessName}) was already contacted by ${check.contactedBy}`);
+        continue;
+      }
+
+      // Generate requirement-tailored pitch for this specific lead
+      const personalizedPitch = generateLeadSpecificPitch(lead, {
+        template: messageText || 'dynamic-req',
+        lang: options.lang || 'auto'
+      });
+
       const jid = `${phone}@s.whatsapp.net`;
-      await sock.sendMessage(jid, { text: messageText });
-      markAsContacted(phone, null, memberName, messageText);
+      console.log(`  🚀 [SENDING PITCH] to ${businessName} (+${phone}) -> Requirement: [${lead?.recommendedService || 'General Audit'}]`);
+
+      await sock.sendMessage(jid, { text: personalizedPitch });
+      markAsContacted(phone, leadId, memberName, personalizedPitch);
+
+      if (leadId) {
+        try {
+          const allLeads = getSavedLeads();
+          const idx = allLeads.findIndex(l => l.leadId === leadId);
+          if (idx !== -1) {
+            allLeads[idx].whatsappSent = true;
+            allLeads[idx].whatsappSentBy = memberName;
+            allLeads[idx].whatsappSentAt = new Date().toISOString();
+            allLeads[idx].whatsappChannel = 'WhatsApp Direct';
+            fs.writeFileSync(path.join(__dirname, 'leads_database.json'), JSON.stringify(allLeads, null, 2));
+          }
+        } catch (dbErr) {
+          console.warn('[DB UPDATE ERROR]', dbErr.message);
+        }
+      }
 
       sentCount++;
-      dispatchReport.push({ phone, status: 'SENT' });
-      console.log(`  ✅ [CUSTOM BULK SENT] to +${phone}`);
+      dispatchReport.push({
+        phone,
+        businessName,
+        status: 'SENT',
+        requirement: lead?.recommendedService || 'Requirement Pitch',
+        pitchPreview: personalizedPitch.substring(0, 70) + '...'
+      });
+      console.log(`  ✅ [SENT] to ${businessName} (+${phone})`);
     } catch (err) {
       failedCount++;
       dispatchReport.push({ phone, status: 'FAILED', error: err.message });
-      console.error(`  ❌ [CUSTOM BULK FAILED] to +${phone}:`, err.message);
+      console.error(`  ❌ [FAILED] to +${phone}:`, err.message);
     }
 
-    // Safety delay between sends
-    await new Promise(r => setTimeout(r, 4500));
+    // Safety delay between sends (5 to 8 seconds)
+    const delayMs = Math.floor(Math.random() * 3000) + 5000;
+    await new Promise(r => setTimeout(r, delayMs));
   }
 
   return {
@@ -317,6 +480,7 @@ export async function sendBulkCustomWhatsAppMessages(numbersList = [], messageTe
     total: validNumbers.length,
     sent: sentCount,
     failed: failedCount,
+    skipped: skippedCount,
     report: dispatchReport
   };
 }

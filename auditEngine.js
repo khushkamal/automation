@@ -234,14 +234,49 @@ export function getRandomGlobalTarget(preferredRegion = 'Worldwide') {
   return { city: randomCity, keyword: randomKeyword, region: preferredRegion };
 }
 
-// 1. Geocode City using Nominatim (with strict 5s timeout)
+const KNOWN_CITY_BBOXES = {
+  mumbai: { south: '18.88', north: '19.32', west: '72.75', east: '73.05' },
+  delhi: { south: '28.40', north: '28.88', west: '76.84', east: '77.35' },
+  'delhi ncr': { south: '28.30', north: '28.90', west: '76.80', east: '77.55' },
+  gurgaon: { south: '28.35', north: '28.55', west: '76.90', east: '77.12' },
+  noida: { south: '28.45', north: '28.65', west: '77.28', east: '77.45' },
+  bangalore: { south: '12.80', north: '13.15', west: '77.45', east: '77.80' },
+  bengaluru: { south: '12.80', north: '13.15', west: '77.45', east: '77.80' },
+  hyderabad: { south: '17.20', north: '17.60', west: '78.20', east: '78.60' },
+  pune: { south: '18.40', north: '18.65', west: '73.70', east: '74.05' },
+  chennai: { south: '12.90', north: '13.25', west: '80.10', east: '80.35' },
+  kolkata: { south: '22.45', north: '22.75', west: '88.25', east: '88.50' },
+  ahmedabad: { south: '22.90', north: '23.20', west: '72.45', east: '72.75' },
+  jaipur: { south: '26.75', north: '27.05', west: '75.65', east: '75.95' },
+  chandigarh: { south: '30.65', north: '30.80', west: '76.70', east: '76.85' },
+  lucknow: { south: '26.75', north: '27.00', west: '80.85', east: '81.05' },
+  indore: { south: '22.65', north: '22.80', west: '75.80', east: '76.00' },
+  surat: { south: '21.10', north: '21.30', west: '72.75', east: '72.95' },
+  'new york': { south: '40.47', north: '40.91', west: '-74.26', east: '-73.70' },
+  london: { south: '51.28', north: '51.69', west: '-0.51', east: '0.33' },
+  dubai: { south: '24.95', north: '25.35', west: '55.05', east: '55.45' },
+  toronto: { south: '43.58', north: '43.85', west: '-79.64', east: '-79.11' },
+  sydney: { south: '-34.05', north: '-33.65', west: '150.95', east: '151.35' }
+};
+
+// 1. Geocode City using Fast BBox / Nominatim
 async function geocodeCity(city) {
+  const norm = (city || '').toLowerCase().trim();
+  if (KNOWN_CITY_BBOXES[norm]) {
+    return KNOWN_CITY_BBOXES[norm];
+  }
+  for (const [k, bbox] of Object.entries(KNOWN_CITY_BBOXES)) {
+    if (norm.includes(k) || k.includes(norm)) {
+      return bbox;
+    }
+  }
+
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
+  const timeoutId = setTimeout(() => controller.abort(), 4000);
   try {
     const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`;
     const res = await fetch(geoUrl, {
-      headers: { 'User-Agent': 'LeadGenTool-Agency/1.0' },
+      headers: { 'User-Agent': 'LeadGenAuditTool/2.0 (Windows NT 10.0; Win64; x64)' },
       signal: controller.signal
     });
     clearTimeout(timeoutId);
@@ -658,11 +693,27 @@ export async function processElement(elem, queueKeyword, queueCity) {
     return { skipped: true, reason: 'Duplicate ID already processed', leadId };
   }
 
-  const phone = tags.phone || tags['contact:phone'] || tags['contact:mobile'] || '';
-  const digits = phone.replace(/[^0-9]/g, '');
+  const tags = elem.tags || {};
+  const businessName = tags.name || tags['name:en'] || tags.brand || tags.operator || '';
+  const category = tags.amenity || tags.healthcare || tags.shop || tags.office || tags.craft || tags.tourism || queueKeyword || 'Business';
+  const city = tags['addr:city'] || queueCity || 'City';
 
-  // 1. Strict Phone Filter: Do NOT enter or qualify leads without a valid phone number!
-  if (!phone || phone === 'Not listed' || phone === 'DM for Contact' || digits.length < 7) {
+  // Extract phone across all possible OSM tag standards
+  const rawPhone = tags.phone || tags['contact:phone'] || tags['contact:mobile'] || tags.mobile || tags['phone:mobile'] || tags['contact:whatsapp'] || tags.whatsapp || '';
+  const firstPhone = rawPhone.split(/[;,/]/)[0].trim();
+  const digits = firstPhone.replace(/[^0-9]/g, '');
+
+  // 1. Strict Name Filter: Discard elements without a valid real business name
+  if (!businessName || businessName.trim().length < 3 || businessName.toLowerCase().includes('unnamed') || businessName === 'undefined') {
+    return {
+      skipped: true,
+      reason: 'Filtered: Business name is missing or unnamed',
+      leadId
+    };
+  }
+
+  // 2. Strict Phone Filter: Do NOT enter or qualify leads without a valid phone number!
+  if (!firstPhone || firstPhone === 'Not listed' || firstPhone === 'DM for Contact' || digits.length < 7) {
     return {
       skipped: true,
       reason: `Filtered: No valid contact/phone number available (${businessName})`,
@@ -670,11 +721,19 @@ export async function processElement(elem, queueKeyword, queueCity) {
     };
   }
 
+  // Format clean readable phone
+  let phone = firstPhone;
+  if (digits.length === 10 && ['6', '7', '8', '9'].includes(digits[0])) {
+    phone = `+91 ${digits.substring(0, 5)} ${digits.substring(5)}`;
+  } else if (digits.startsWith('91') && digits.length === 12) {
+    phone = `+91 ${digits.substring(2, 7)} ${digits.substring(7)}`;
+  }
+
   // 2. Strict High-Budget Filter: Discard small micro-stores / low-profit shops
   if (isLowProfitMicroBusiness(businessName, category, tags)) {
     return { 
       skipped: true, 
-      reason: `Filtered: Low-profit micro store / small retailer with low budget capacity (${businessName})`, 
+      reason: `Filtered: Low-profit micro store / small retailer with low budget capacity (${businessName || 'Unnamed'})`, 
       leadId 
     };
   }
@@ -693,12 +752,20 @@ export async function processElement(elem, queueKeyword, queueCity) {
     tags['addr:housename'],
     tags['addr:housenumber'],
     tags['addr:street'],
-    tags['addr:city'],
+    tags['addr:suburb'] || tags['addr:district'],
+    tags['addr:city'] || city,
     tags['addr:postcode']
   ].filter(Boolean);
   const address = addressParts.length > 0 ? addressParts.join(', ') : `${city} Area`;
 
-  const websiteUrl = tags.website || tags['contact:website'] || tags.url || '';
+  // Real Google Maps Location URL based on coordinates or place name
+  const lat = elem.lat || elem.center?.lat;
+  const lon = elem.lon || elem.center?.lon;
+  const googleMapsUrl = (lat && lon)
+    ? `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(businessName + ' ' + city)}`;
+
+  const websiteUrl = tags.website || tags['contact:website'] || tags.url || tags['website:en'] || '';
   const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
   let leadRecord = null;
@@ -711,16 +778,16 @@ export async function processElement(elem, queueKeyword, queueCity) {
   if (!websiteUrl) {
     leadRecord = {
       leadId,
-      businessName,
+      businessName: businessName || `${category} (${city})`,
       category,
       city,
       address,
       phone,
       website: '',
-      googleMapsUrl: 'Not available',
-      rating: 'Not available',
-      reviews: 'Not available',
-      websiteStatus: 'Not Listed in Maps',
+      googleMapsUrl,
+      rating: 'Active Store',
+      reviews: 'Local Listing',
+      websiteStatus: 'No Website',
       websiteQuality: 'None',
       mobileFriendly: 'No',
       cta: 'Not visible',
@@ -758,9 +825,9 @@ export async function processElement(elem, queueKeyword, queueCity) {
         address,
         phone,
         website: websiteUrl,
-        googleMapsUrl: 'Not available',
-        rating: 'Not available',
-        reviews: 'Not available',
+        googleMapsUrl,
+        rating: 'Active Store',
+        reviews: 'Local Listing',
         websiteStatus: 'Unable to fetch',
         websiteQuality: 'Needs Check',
         mobileFriendly: 'Unknown',
@@ -805,9 +872,9 @@ export async function processElement(elem, queueKeyword, queueCity) {
         address,
         phone,
         website: fetchRes.url,
-        googleMapsUrl: 'Not available',
-        rating: 'Not available',
-        reviews: 'Not available',
+        googleMapsUrl,
+        rating: 'Active Store',
+        reviews: 'Local Listing',
         websiteStatus: 'Live',
         websiteQuality: audit.websiteQuality,
         mobileFriendly: audit.hasViewport,
