@@ -19,12 +19,7 @@ function initStores() {
     fs.writeFileSync(LEADS_DB_PATH, JSON.stringify([], null, 2));
   }
   if (!fs.existsSync(SEARCH_QUEUE_PATH)) {
-    const defaultQueue = [
-      { id: '1', keyword: 'dentist', city: 'Mumbai', status: 'Ready', createdAt: new Date().toISOString() },
-      { id: '2', keyword: 'restaurant', city: 'Delhi', status: 'Ready', createdAt: new Date().toISOString() },
-      { id: '3', keyword: 'salon', city: 'Bangalore', status: 'Ready', createdAt: new Date().toISOString() }
-    ];
-    fs.writeFileSync(SEARCH_QUEUE_PATH, JSON.stringify(defaultQueue, null, 2));
+    fs.writeFileSync(SEARCH_QUEUE_PATH, JSON.stringify([], null, 2));
   }
 }
 
