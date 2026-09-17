@@ -422,7 +422,7 @@ out center ${maxResults};`;
   return [];
 }
 
-// 3. Fast & Graceful Website Fetcher (6s timeout)
+// 3. Fast & Robust Website Fetcher (with HTTPS->HTTP fallback and browser emulation)
 export async function fetchWebsite(url) {
   if (!url) return { ok: false, error: 'No URL provided' };
   
@@ -431,31 +431,59 @@ export async function fetchWebsite(url) {
     targetUrl = 'https://' + targetUrl;
   }
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000);
+  const browserHeaders = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1'
+  };
 
+  // Attempt 1: Fetch target URL
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
+
     const response = await fetch(targetUrl, {
       method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-      },
+      headers: browserHeaders,
       redirect: 'follow',
       signal: controller.signal
     });
     clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      return { ok: false, status: `HTTP ${response.status}`, url: targetUrl };
+    if (response.ok) {
+      const html = await response.text();
+      return { ok: true, html, url: response.url || targetUrl };
     }
-
-    const html = await response.text();
-    return { ok: true, html, url: response.url || targetUrl };
-  } catch (error) {
-    clearTimeout(timeoutId);
-    return { ok: false, error: error.message, url: targetUrl };
+  } catch (err) {
+    // If HTTPS failed, fallback to HTTP
+    if (targetUrl.startsWith('https://')) {
+      const httpUrl = 'http://' + targetUrl.replace('https://', '');
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const response = await fetch(httpUrl, {
+          method: 'GET',
+          headers: browserHeaders,
+          redirect: 'follow',
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (response.ok) {
+          const html = await response.text();
+          return { ok: true, html, url: response.url || httpUrl };
+        }
+      } catch (httpErr) {
+        // Fallback failed
+      }
+    }
   }
+
+  return { ok: false, error: 'Website inaccessible / server timeout', url: targetUrl };
 }
 
 // Indian Cities list for language auto-detection
@@ -484,82 +512,129 @@ export function isIndianLocation(city, phone) {
   return false;
 }
 
-// 4. Rule-Based Website Audit Engine (No AI API, 100% Deterministic)
+// 4. Rule-Based Website & SEO Audit Engine (100% Deterministic & Realistic)
 export function auditWebsiteHtml(html, siteUrl, businessName, category, city, phone) {
   const lowerHtml = (html || '').toLowerCase();
   
+  // 1. SSL & Security Check
   const isHttps = siteUrl.toLowerCase().startsWith('https://') || lowerHtml.includes('https://') ? 'Yes' : 'No';
+  
+  // 2. Mobile Responsiveness Check
   const hasViewport = lowerHtml.includes('name="viewport"') || lowerHtml.includes("name='viewport'") ? 'Yes' : 'No';
-  const hasPhone = lowerHtml.includes('tel:') || lowerHtml.includes('call now') || lowerHtml.includes('phone') ? 'Detected' : 'Not detected';
-  const hasCTA = lowerHtml.includes('contact') || lowerHtml.includes('get quote') || lowerHtml.includes('get started') || lowerHtml.includes('inquiry') || lowerHtml.includes('request a quote') ? 'Detected' : 'Not detected';
+  
+  // 3. SEO Meta & Title Checks
+  const hasTitleTag = lowerHtml.includes('<title>') && lowerHtml.includes('</title>');
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  const titleText = titleMatch ? titleMatch[1].trim() : '';
+  const hasGoodTitle = Boolean(titleText && titleText.length >= 5 && !titleText.toLowerCase().includes('untitled'));
+  
+  const hasMetaDescription = lowerHtml.includes('name="description"') || lowerHtml.includes("name='description'") || lowerHtml.includes('property="og:description"');
+  const hasSchema = lowerHtml.includes('application/ld+json') || lowerHtml.includes('schema.org') || lowerHtml.includes('itemscope');
+
+  // 4. Conversion & CTAs Checks
+  const hasPhone = lowerHtml.includes('tel:') || lowerHtml.includes('call now') || lowerHtml.includes('phone') || lowerHtml.includes('contact');
+  const hasCTA = lowerHtml.includes('contact') || lowerHtml.includes('get quote') || lowerHtml.includes('get started') || lowerHtml.includes('inquiry') || lowerHtml.includes('request a quote') || lowerHtml.includes('<form');
   const hasWhatsApp = lowerHtml.includes('wa.me') || lowerHtml.includes('whatsapp.com') || lowerHtml.includes('api.whatsapp.com') ? 'Detected' : 'Not detected';
-  const hasBooking = lowerHtml.includes('calendly.com') || lowerHtml.includes('acuityscheduling.com') || lowerHtml.includes('appointment') || lowerHtml.includes('book now') || lowerHtml.includes('schedule') || lowerHtml.includes('zocdoc') ? 'Detected' : 'Not detected';
-  const hasTracking = lowerHtml.includes('googletagmanager.com') || lowerHtml.includes('fbq(') || lowerHtml.includes('connect.facebook.net') || lowerHtml.includes('google_conversion') ? 'Detected' : 'Not detected';
+  const hasBooking = lowerHtml.includes('calendly.com') || lowerHtml.includes('acuityscheduling.com') || lowerHtml.includes('appointment') || lowerHtml.includes('book now') || lowerHtml.includes('schedule') || lowerHtml.includes('zocdoc') || lowerHtml.includes('practo') ? 'Detected' : 'Not detected';
+  const hasTracking = lowerHtml.includes('googletagmanager.com') || lowerHtml.includes('fbq(') || lowerHtml.includes('connect.facebook.net') || lowerHtml.includes('gtag(') || lowerHtml.includes('google-analytics.com') ? 'Detected' : 'Not detected';
 
-  let score = 0;
-  if (isHttps === 'No') score += 20;
-  if (hasViewport === 'No') score += 25;
-  if (hasWhatsApp === 'Not detected') score += 15;
-  if (hasBooking === 'Not detected') score += 20;
-  if (hasCTA === 'Not detected') score += 10;
-  if (hasTracking === 'Not detected') score += 10;
+  // 5. Accurate Opportunity / Penalty Scoring (Lower = Website is already great; Higher = High need for service)
+  let penaltyScore = 0;
+  const missingIssues = [];
 
-  let leadPriority = 'Low';
-  if (score >= 80) leadPriority = 'Hot';
-  else if (score >= 60) leadPriority = 'Warm';
-  else if (score >= 40) leadPriority = 'Potential';
-
-  let recommendedService = 'Digital Marketing Setup';
-  if (hasViewport === 'No') recommendedService = 'Mobile Optimization';
-  else if (isHttps === 'No') recommendedService = 'Website Redesign';
-  else if (hasBooking === 'Not detected') recommendedService = 'Online Booking System';
-  else if (hasWhatsApp === 'Not detected') recommendedService = 'WhatsApp Automation';
-
-  const reasons = [];
-  if (isHttps === 'No') reasons.push('No SSL/HTTPS');
-  if (hasViewport === 'No') reasons.push('Not Mobile Responsive');
-  if (hasWhatsApp === 'Not detected') reasons.push('Missing Direct WhatsApp Hook');
-  if (hasBooking === 'Not detected') reasons.push('No Instant Online Booking');
-  if (hasTracking === 'Not detected') reasons.push('No Retargeting Pixel/Analytics');
-  const auditReason = reasons.length > 0 ? reasons.join(', ') : 'Standard Web Maintenance';
-
-  // Deterministic Outreach Pitch Generator (English & Hinglish)
-  const missingFeaturesEn = [];
-  const missingFeaturesHi = [];
+  if (isHttps === 'No') {
+    penaltyScore += 30;
+    missingIssues.push('No SSL/HTTPS (Unsecured site)');
+  }
   if (hasViewport === 'No') {
-    missingFeaturesEn.push('mobile responsiveness');
-    missingFeaturesHi.push('mobile-friendly design');
+    penaltyScore += 35;
+    missingIssues.push('Not Mobile Responsive');
+  }
+  if (!hasGoodTitle || !hasMetaDescription) {
+    penaltyScore += 15;
+    missingIssues.push('Missing SEO Meta Tags');
+  }
+  if (!hasCTA) {
+    penaltyScore += 15;
+    missingIssues.push('No Clear Contact / CTA Button');
   }
   if (hasWhatsApp === 'Not detected') {
-    missingFeaturesEn.push('1-click customer chat');
-    missingFeaturesHi.push('direct WhatsApp customer chat button');
+    penaltyScore += 10;
+    missingIssues.push('Missing Direct WhatsApp Hook');
   }
   if (hasBooking === 'Not detected') {
-    missingFeaturesEn.push('online appointment booking');
-    missingFeaturesHi.push('online appointment booking system');
+    penaltyScore += 10;
+    missingIssues.push('No Instant Online Booking System');
   }
-  
-  const featureListEn = missingFeaturesEn.length > 0 ? missingFeaturesEn.join(' and ') : 'modern UI design upgrades';
-  const featureListHi = missingFeaturesHi.length > 0 ? missingFeaturesHi.join(' aur ') : 'website upgrades';
+  if (hasTracking === 'Not detected') {
+    penaltyScore += 5;
+    missingIssues.push('No Retargeting Pixel/Analytics');
+  }
 
+  // Cap score between 10 and 100
+  let calculatedScore = Math.max(10, Math.min(100, penaltyScore));
+
+  // Determine Website Quality based on real factors
+  let websiteQuality = 'Good';
+  let leadPriority = 'Low';
+
+  if (hasViewport === 'No' || isHttps === 'No' || calculatedScore >= 70) {
+    websiteQuality = 'Poor / Needs Redesign';
+    leadPriority = 'Hot';
+  } else if (calculatedScore >= 45) {
+    websiteQuality = 'Fair / Optimization Needed';
+    leadPriority = 'Warm';
+  } else if (calculatedScore >= 25) {
+    websiteQuality = 'Good';
+    leadPriority = 'Potential';
+  } else {
+    websiteQuality = 'Excellent / Fully Optimized';
+    leadPriority = 'Low';
+  }
+
+  // Determine Recommended Service accurately
+  let recommendedService = 'Digital Growth & WhatsApp Funnel';
+  if (hasViewport === 'No') recommendedService = 'Mobile Responsive Redesign';
+  else if (isHttps === 'No') recommendedService = 'SSL & Website Security Overhaul';
+  else if (!hasGoodTitle || !hasMetaDescription) recommendedService = 'Local SEO & Meta Optimization';
+  else if (hasWhatsApp === 'Not detected') recommendedService = 'WhatsApp Lead Automation';
+  else if (hasBooking === 'Not detected') recommendedService = 'Online Booking Funnel';
+  else if (calculatedScore <= 25) recommendedService = 'Advanced SEO & Paid Ads Scaling';
+
+  const auditReason = missingIssues.length > 0 
+    ? missingIssues.slice(0, 3).join(', ') 
+    : 'Website is already well-optimized with active SSL, mobile responsiveness & SEO structure';
+
+  // Deterministic Outreach Pitch Generator (Honest & tailored to what is actually missing)
   const isIndia = isIndianLocation(city, phone);
+  let outreachMessageEn = '';
+  let outreachMessageHi = '';
 
-  // High-converting messages
-  const outreachMessageEn = `Hi ${businessName || 'Business Owner'}, I reviewed ${siteUrl} for your ${category} in ${city} and noticed you could attract significantly more clients by adding ${featureListEn}. We specialize in setting this up for local businesses. Would you be open to a quick 5-min demo?`;
-  const outreachMessageHi = `Namaste ${businessName || 'Sir/Ma\'am'}, maine aapka ${category} business ${city} me review kiya. Aapki website ${siteUrl} par agar ${featureListHi} add karein toh aapko local clients se daily 2x se 3x zyada inquiries mil sakti hain. Kya hum ispar 5-min discuss kar sakte hain?`;
+  if (calculatedScore <= 25) {
+    // If website is already great, compliment it and pitch traffic / WhatsApp scaling
+    outreachMessageEn = `Hi ${businessName || 'Team'}, I reviewed your website ${siteUrl} for ${category} in ${city}. Your web presence and design look solid! We help established businesses integrate 1-click WhatsApp customer conversion funnels & run high-ROI local ads. Would you be open to a 2-min chat on scaling inquiries?`;
+    outreachMessageHi = `Namaste ${businessName || 'Sir/Ma\'am'}, maine aapka ${category} business ${city} me review kiya. Aapki website ${siteUrl} ka design aur online presence kaafi accha hai! Hum established businesses ke liye direct WhatsApp conversion funnels aur Google Ads setup karte hain jisse high-ticket clients attract hon. Kya hum ispar short 2-min discuss kar sakte hain?`;
+  } else {
+    // If missing features, mention exact missing gaps
+    const missingEn = missingIssues.slice(0, 2).join(' and ');
+    const missingHi = missingIssues.slice(0, 2).join(' aur ');
+    
+    outreachMessageEn = `Hi ${businessName || 'Business Owner'}, I reviewed ${siteUrl} for your ${category} in ${city} and noticed potential improvements in ${missingEn}. Fixing these can boost your customer inquiries significantly. Can I share a quick 2-min overview?`;
+    outreachMessageHi = `Namaste ${businessName || 'Sir/Ma\'am'}, maine ${city} me aapke ${category} business ki website ${siteUrl} audit ki. Isme ${missingHi} optimize karke aap direct customer inquiries 2x se 3x boost kar sakte hain. Kya main short 2-minute overview share karun?`;
+  }
 
-  // Auto-assign: If international -> Professional English, If India -> Hinglish
   const outreachMessage = isIndia ? outreachMessageHi : outreachMessageEn;
 
   return {
     isHttps,
     hasViewport,
-    hasPhone,
-    hasCTA,
+    hasPhone: hasPhone ? 'Detected' : 'Not detected',
+    hasCTA: hasCTA ? 'Detected' : 'Not detected',
     hasWhatsApp,
     hasBooking,
     hasTracking,
-    calculatedScore: score,
+    hasSEO: hasGoodTitle && hasMetaDescription ? 'Yes' : 'Basic',
+    calculatedScore,
     leadPriority,
     recommendedService,
     auditReason,
@@ -567,8 +642,8 @@ export function auditWebsiteHtml(html, siteUrl, businessName, category, city, ph
     outreachMessageEn,
     outreachMessageHi,
     isInternational: !isIndia,
-    websiteQuality: score > 60 ? 'Needs Improvement' : 'Fair',
-    automationStatus: score >= 60 ? 'High Opportunity' : 'Moderate Opportunity'
+    websiteQuality,
+    automationStatus: calculatedScore >= 50 ? 'High Opportunity' : 'Moderate Opportunity'
   };
 }
 
@@ -645,8 +720,8 @@ export async function processElement(elem, queueKeyword, queueCity) {
       googleMapsUrl: 'Not available',
       rating: 'Not available',
       reviews: 'Not available',
-      websiteStatus: 'No Website',
-      websiteQuality: 'Poor',
+      websiteStatus: 'Not Listed in Maps',
+      websiteQuality: 'None',
       mobileFriendly: 'No',
       cta: 'Not visible',
       whatsApp: 'Not visible',
@@ -658,8 +733,8 @@ export async function processElement(elem, queueKeyword, queueCity) {
       leadPriority: 'Hot',
       purchasingPower,
       ticketSize,
-      recommendedService: 'Website Development',
-      auditReason: 'High-ticket business has no active website (losing clients to competitors)',
+      recommendedService: 'Website Development & Funnel Setup',
+      auditReason: 'Business has no verified website listed on Google / Maps directory',
       outreachMessage: isIndia ? outreachMessageHiNoWeb : outreachMessageEnNoWeb,
       outreachMessageEn: outreachMessageEnNoWeb,
       outreachMessageHi: outreachMessageHiNoWeb,
@@ -687,7 +762,7 @@ export async function processElement(elem, queueKeyword, queueCity) {
         rating: 'Not available',
         reviews: 'Not available',
         websiteStatus: 'Unable to fetch',
-        websiteQuality: 'Unknown',
+        websiteQuality: 'Needs Check',
         mobileFriendly: 'Unknown',
         cta: 'Unknown',
         whatsApp: 'Unknown',
@@ -695,12 +770,12 @@ export async function processElement(elem, queueKeyword, queueCity) {
         adsStatus: 'Unknown / Not publicly verifiable',
         automationStatus: 'High Opportunity',
         aiOpportunity: 'Website Recovery & Funnel Rebuild',
-        leadScore: Math.min(100, 65 + budgetBonus),
+        leadScore: Math.min(100, 60 + budgetBonus),
         leadPriority: 'Warm',
         purchasingPower,
         ticketSize,
-        recommendedService: 'Website Redesign',
-        auditReason: 'Website could not be fetched for automated inspection (Server down / SSL broken)',
+        recommendedService: 'Website Redesign & Security Fix',
+        auditReason: 'Website could not be fetched for automated inspection (Server down / SSL broken / Bot blocked)',
         outreachMessage: isIndia ? brokenHi : brokenEn,
         outreachMessageEn: brokenEn,
         outreachMessageHi: brokenHi,
@@ -711,11 +786,16 @@ export async function processElement(elem, queueKeyword, queueCity) {
     } else {
       const audit = auditWebsiteHtml(fetchRes.html, fetchRes.url, businessName, category, city, phone);
       
-      const finalScore = Math.min(100, audit.calculatedScore + budgetBonus);
-      // Filter: Only leads with score >= 40
-      if (finalScore < 40) {
-        return { skipped: true, reason: 'Lead score below qualification threshold (< 40)', leadId, score: finalScore };
-      }
+      // Only apply budget bonus if the website genuinely has audit opportunities (score >= 40)
+      const finalScore = audit.calculatedScore >= 40 
+        ? Math.min(100, audit.calculatedScore + budgetBonus)
+        : audit.calculatedScore;
+
+      let leadPriority = 'Low';
+      if (finalScore >= 75) leadPriority = 'Hot';
+      else if (finalScore >= 45) leadPriority = 'Warm';
+      else if (finalScore >= 25) leadPriority = 'Potential';
+      else leadPriority = 'Low';
 
       leadRecord = {
         leadId,
@@ -736,9 +816,9 @@ export async function processElement(elem, queueKeyword, queueCity) {
         onlineBooking: audit.hasBooking,
         adsStatus: audit.hasTracking,
         automationStatus: audit.automationStatus,
-        aiOpportunity: 'High-Ticket Conversion Optimization & Booking System',
+        aiOpportunity: finalScore >= 50 ? 'Conversion Optimization & Booking Funnel' : 'Advanced Traffic & Ads Scaling',
         leadScore: finalScore,
-        leadPriority: finalScore >= 80 ? 'Hot' : (finalScore >= 60 ? 'Warm' : 'Potential'),
+        leadPriority,
         purchasingPower,
         ticketSize,
         recommendedService: audit.recommendedService,
