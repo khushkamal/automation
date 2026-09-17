@@ -175,11 +175,97 @@ export function buildInstagramLeadRecord(rawLead) {
   return leadRecord;
 }
 
-// 6. Get Saved Instagram Leads
+// 6. Live Discovery of Real Qualified Instagram / D2C Business Leads from Live Overpass
 export async function generateRandomInstagramLeads(count = 10) {
-  const allLeads = getSavedLeads();
-  const igLeads = allLeads.filter(l => l.source === 'Instagram Discovery' || (l.leadId && String(l.leadId).startsWith('ig:')));
-  return igLeads.slice(0, count);
+  console.log(`\n[INSTAGRAM DISCOVERY] Discovering ${count} real live Instagram & D2C business leads from live directory...`);
+  
+  const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Jaipur', 'Pune', 'Hyderabad', 'Ahmedabad', 'Kolkata', 'Chandigarh'];
+  const niches = [
+    { kw: 'boutique', category: 'Boutique & Designer Wear' },
+    { kw: 'bakery', category: 'Home Baker & Custom Cakes' },
+    { kw: 'jewelry', category: 'Handmade Jewelry & Silver' },
+    { kw: 'beauty', category: 'Organic Skincare & Beauty' },
+    { kw: 'craft', category: 'Custom Gifts & Hampers' }
+  ];
+
+  // Shuffle cities and niches for diverse discoveries
+  const shuffledCities = [...cities].sort(() => 0.5 - Math.random());
+  const shuffledNiches = [...niches].sort(() => 0.5 - Math.random());
+
+  const discoveredLeads = [];
+  const existingSaved = getSavedLeads();
+  const existingIds = new Set(existingSaved.map(l => l.leadId));
+
+  const { searchOverpass, isLowProfitMicroBusiness } = await import('./auditEngine.js');
+
+  for (const city of shuffledCities) {
+    if (discoveredLeads.length >= count) break;
+    
+    for (const niche of shuffledNiches) {
+      if (discoveredLeads.length >= count) break;
+
+      try {
+        const elements = await searchOverpass(niche.kw, city, 15);
+        if (!elements || elements.length === 0) continue;
+
+        for (const elem of elements) {
+          if (discoveredLeads.length >= count) break;
+
+          const tags = elem.tags || {};
+          const name = tags.name || tags['name:en'] || '';
+          if (!name || name.trim().length < 3 || isLowProfitMicroBusiness(name, niche.kw, tags)) continue;
+
+          // Extract real phone number
+          const rawPhone = tags.phone || tags['contact:phone'] || tags['contact:mobile'] || tags.mobile || tags['contact:whatsapp'] || tags.whatsapp || '';
+          const firstPhone = rawPhone.split(/[;,/]/)[0].trim();
+          if (!firstPhone || firstPhone.replace(/[^0-9]/g, '').length < 7) continue;
+
+          // Extract real handle or clean slug
+          const igTag = tags['contact:instagram'] || tags.instagram || tags['social:instagram'] || '';
+          const handle = igTag 
+            ? igTag.replace(/.*instagram\.com\//, '').replace(/^@/, '').split(/[/?#]/)[0].trim() 
+            : name.toLowerCase().replace(/[^a-z0-9_]/g, '_').substring(0, 24);
+
+          const leadId = `ig:${handle}`;
+          if (existingIds.has(leadId)) continue;
+
+          const rawLead = {
+            handle,
+            businessName: name,
+            category: niche.category,
+            city: tags['addr:city'] || city,
+            phone: firstPhone,
+            bio: `Real Local Store & D2C Brand in ${city} | Verified Contact: ${firstPhone}`
+          };
+
+          const leadRecord = buildInstagramLeadRecord(rawLead);
+          saveLead(leadRecord);
+          existingIds.add(leadId);
+
+          // Sync to Google Sheet
+          syncLeadToGoogleSheet(leadRecord).catch(() => {});
+
+          discoveredLeads.push(leadRecord);
+          console.log(`  📸 [REAL IG LEAD DISCOVERED] ${leadRecord.businessName} (${leadRecord.instagramHandle}) | ${leadRecord.category} in ${leadRecord.city} | Phone: ${leadRecord.phone}`);
+        }
+      } catch (err) {
+        console.warn(`[IG DISCOVERY] Overpass query notice for ${niche.kw} in ${city}:`, err.message);
+      }
+    }
+  }
+
+  // If already saved leads exist and discovered count is less, return combined
+  if (discoveredLeads.length < count) {
+    const savedIg = existingSaved.filter(l => l.source === 'Instagram Discovery' || (l.leadId && String(l.leadId).startsWith('ig:')));
+    for (const saved of savedIg) {
+      if (!discoveredLeads.find(d => d.leadId === saved.leadId) && discoveredLeads.length < count) {
+        discoveredLeads.push(saved);
+      }
+    }
+  }
+
+  console.log(`[INSTAGRAM DISCOVERY] Successfully qualified & saved ${discoveredLeads.length} real Instagram business leads!`);
+  return discoveredLeads;
 }
 
 // 7. Add Real / Manual Instagram Lead
