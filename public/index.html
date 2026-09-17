@@ -517,212 +517,157 @@
       <!-- TAB 2: WHATSAPP OUTREACH CENTER -->
       <section id="tab-whatsapp" class="tab-content page-body">
         <!-- 1. Meta WhatsApp Business Cloud API Card (Primary Official Integration) -->
-        <div class="search-card"
-          style="border: 1px solid rgba(16,185,129,0.4); background: radial-gradient(circle at top right, rgba(16,185,129,0.08), transparent 70%), var(--bg-surface);">
-          <div
-            style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:18px;">
-            <div>
-              <div
-                style="display:inline-flex; align-items:center; gap:8px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); border-radius:20px; padding:4px 14px; margin-bottom:8px;">
-                <span style="font-size:12px; font-weight:800; color:var(--brand-emerald);">⚡ OFFICIAL META WHATSAPP BUSINESS CLOUD API</span>
-                <span
-                  style="font-size:10px; background:var(--brand-emerald); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Zero QR Scan Required</span>
-              </div>
-              <h3 style="font-size:18px; font-weight:800; color:var(--text-primary); margin-bottom:4px;">Meta WhatsApp Cloud API Direct Dispatcher</h3>
-              <p style="font-size:13px; color:var(--text-secondary); max-width:680px;">
-                Send verified WhatsApp audit pitches directly to Instagram & Google Maps leads via official Meta Cloud API. No phone pairing, QR code scanning, or battery drain.
-              </p>
+      <!-- TAB 2: WHATSAPP OUTREACH CENTER -->
+      <section id="tab-whatsapp" class="tab-content page-body">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:24px;">
+          
+          <!-- 1. QR CODE SCANNING STATE (Shown when Disconnected) -->
+          <div id="wa-qr-container" style="text-align:center; padding:24px; background:radial-gradient(circle at top, rgba(16,185,129,0.06), transparent 70%), var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md);">
+            <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); border-radius:20px; padding:4px 14px; margin-bottom:12px;">
+              <span style="font-size:12px; font-weight:800; color:var(--brand-emerald);">📱 100% FREE WHATSAPP CONNECTION</span>
+              <span style="font-size:10px; background:var(--brand-emerald); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Direct Web Socket</span>
             </div>
-
-            <div id="wa-connection-badge-container">
-              <span id="wa-live-status-pill" class="pill-tag"
-                style="padding:6px 14px; font-size:13px; font-weight:700; background:rgba(100,116,139,0.1); color:var(--text-secondary);">
-                ⚪ Checking Status...
-              </span>
-            </div>
-          </div>
-
-          <!-- Meta Cloud API Configuration Form -->
-          <form id="form-wa-cloud-config"
-            style="display:flex; flex-direction:column; gap:14px; background:var(--bg-surface-elevated); padding:18px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <div
-              style="font-size:13px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
-              <span>🔑 Meta Developer WhatsApp Credentials</span>
-              <span style="font-size:11px; font-weight:500; color:var(--text-tertiary);">(From developers.facebook.com ➔ WhatsApp ➔ API Setup)</span>
-            </div>
-
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
-              <div class="form-group">
-                <label for="wa-input-phone-id">Phone Number ID *</label>
-                <input type="text" id="wa-input-phone-id" class="form-control" placeholder="e.g. 548291048291049" required>
-              </div>
-
-              <div class="form-group">
-                <label for="wa-input-access-token">Permanent Access Token (Bearer) *</label>
-                <input type="password" id="wa-input-access-token" class="form-control" placeholder="EAAG..." required>
-              </div>
-
-              <div class="form-group">
-                <label for="wa-input-biz-phone">Sender WhatsApp Number</label>
-                <input type="text" id="wa-input-biz-phone" class="form-control" placeholder="e.g. +91 98765 43210">
-              </div>
-
-              <div class="form-group">
-                <label for="wa-input-account-id">WhatsApp Business Account ID (WABA ID)</label>
-                <input type="text" id="wa-input-account-id" class="form-control" placeholder="e.g. 1093829102938">
-              </div>
-            </div>
-
-            <div
-              style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:4px;">
-              <div id="wa-cloud-test-status" style="font-size:12px; font-weight:600;"></div>
-
-              <div style="display:flex; gap:10px;">
-                <button type="button" id="btn-test-wa-cloud" class="btn btn-secondary btn-sm" style="height:38px;">
-                  🧪 Test Meta Connection
-                </button>
-                <button type="submit" id="btn-save-wa-cloud" class="btn btn-emerald btn-sm"
-                  style="height:38px; padding:0 22px; font-weight:700;">
-                  💾 Save WhatsApp Business API
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <!-- 2. Direct Multi-Number Bulk Sender (Custom Numbers & Instant 1-Click) -->
-        <div class="search-card" style="border: 1px solid rgba(249,115,22,0.35); background: radial-gradient(circle at top right, rgba(249,115,22,0.06), transparent 70%), var(--bg-surface);">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
-            <div>
-              <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.3); border-radius:20px; padding:4px 12px; margin-bottom:6px;">
-                <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">🚀 1-CLICK CUSTOM NUMBER BULK SENDER</span>
-                <span style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Paste Any Numbers</span>
-              </div>
-              <h3 style="font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">Add Numbers & Send Bulk WhatsApp DMs</h3>
-              <p style="font-size:13px; color:var(--text-secondary);">
-                Paste any custom numbers or load leads with 1 click to blast personalized pitches instantly.
-              </p>
-            </div>
-          </div>
-
-          <!-- Numbers Input & Quick Load Bar -->
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-              <label for="bulk-custom-numbers" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
-                Enter / Paste Phone Numbers (Comma, space, or new line separated):
-              </label>
-              <div style="display:flex; gap:6px;">
-                <button type="button" id="btn-load-ig-numbers" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 9px;">
-                  📸 + Load Instagram Leads
-                </button>
-                <button type="button" id="btn-load-maps-numbers" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 9px;">
-                  📍 + Load Google Maps Leads
-                </button>
-                <button type="button" id="btn-clear-bulk-numbers" class="btn btn-ghost btn-sm" style="font-size:11px; padding:4px 8px; color:#fb7185;">
-                  ✕ Clear
-                </button>
-              </div>
-            </div>
-
-            <textarea id="bulk-custom-numbers" class="form-control" rows="3" placeholder="e.g. 9811223344, 9876543210, +91 9123456789 (Or click buttons above to auto-load leads)" style="font-family:var(--font-mono); font-size:12px;"></textarea>
+            <h3 style="color:var(--text-primary); font-size:20px; font-weight:800; margin-bottom:6px;">Link Your WhatsApp via QR Code</h3>
+            <p style="color:var(--text-secondary); font-size:13px; max-width:520px; margin:0 auto 20px; line-height:1.5;">
+              Apne phone me WhatsApp open karein ➔ <strong>Settings / 3 Dots ➔ Linked Devices (लिंक्ड डिवाइसेज़) ➔ Link a Device</strong> par click karke neeche diya gaya QR code scan karein.
+            </p>
             
-            <div style="font-size:11px; color:var(--text-tertiary); font-weight:600;">
-              Detected: <span id="bulk-numbers-count" style="color:var(--brand-orange-dark); font-weight:800;">0</span> valid numbers ready to message.
+            <div id="wa-qr-image-box" style="background:#fff; padding:16px; border-radius:var(--radius-md); display:inline-block; box-shadow:0 12px 35px rgba(0,0,0,0.4); min-width:240px; min-height:240px;">
+              <div class="spinner" style="margin:80px auto 16px;"></div>
+              <p style="font-size:12px; color:#64748b; font-weight:600;">Generating QR Code...</p>
             </div>
-
-            <!-- Pitch Message & Template Selector -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:4px;">
-              <label for="bulk-custom-message" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
-                Pitch Message:
-              </label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-size:11px; color:var(--text-tertiary);">Quick Template:</span>
-                <select id="bulk-template-select" class="form-control" style="font-size:11px; padding:3px 8px; height:auto; width:auto;">
-                  <option value="web-audit">🌐 High-Converting Website Pitch</option>
-                  <option value="ig-store">🛍️ Instagram WhatsApp Storefront Pitch</option>
-                  <option value="speed-opt">⚡ Fast Speed & Mobile Optimization</option>
-                  <option value="custom">✏️ Custom Message</option>
-                </select>
-              </div>
-            </div>
-
-            <textarea id="bulk-custom-message" class="pitch-textarea" rows="4"></textarea>
-
-            <!-- Dispatch Action Buttons -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:6px;">
-              <div id="bulk-dispatch-status" style="font-size:12px; font-weight:600;"></div>
-
-              <div style="display:flex; gap:10px;">
-                <button type="button" id="btn-launch-bulk-web-queue" class="btn btn-secondary" style="font-weight:700; height:42px;">
-                  💬 1-Click Rapid Web Queue
-                </button>
-                <button type="button" id="btn-send-bulk-custom-auto" class="btn btn-emerald" style="font-weight:800; height:42px; padding:0 24px; box-shadow:0 4px 14px rgba(16,185,129,0.3);">
-                  🚀 1-Click Blast to All Numbers
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Campaign Hub -->
-        <div
-          style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:20px;">
-          <div>
-            <h4 style="color:var(--text-primary); font-size:16px; font-weight:800; margin-bottom:4px;">🚀 1-Click
-              Automated Campaign Dispatcher</h4>
-            <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
-              Automatically sends customized pitches to all qualified leads (Google Maps + Instagram). Includes built-in
-              multi-member anti-duplicate lock & smart delays.
+            
+            <p style="font-size:12px; color:var(--text-tertiary); margin-top:16px;">
+              🛡️ Zero API charges • No Meta developer account required • Direct automated sending
             </p>
           </div>
 
-          <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
-            <button id="btn-start-wa-campaign" class="btn btn-emerald"
-              style="padding:12px 28px; font-size:14px; font-weight:800; box-shadow:0 4px 14px rgba(16,185,129,0.3);">
-              🚀 Start 1-Click Automated Campaign
-            </button>
-            <button id="btn-stop-wa-campaign" class="btn btn-secondary hidden"
-              style="color:#fb7185; padding:12px 24px; font-weight:700;">
-              ⏹ Stop Campaign
-            </button>
-            <span style="font-size:12px; color:var(--text-tertiary);">✨ Any client already messaged by any team member
-              is automatically skipped</span>
+          <!-- 2. CONNECTED STATE (Shown when QR Scanned & Connected) -->
+          <div id="wa-connected-container" class="hidden" style="display:flex; flex-direction:column; gap:20px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.35); border-radius:var(--radius-sm); padding:16px 20px; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="status-dot online" style="width:12px; height:12px;"></span>
+                <div>
+                  <div style="font-size:11px; font-weight:800; color:var(--brand-emerald); text-transform:uppercase; letter-spacing:0.5px;">🟢 System Connected & Ready</div>
+                  <div style="font-size:18px; font-weight:800; color:var(--text-primary); font-family:var(--font-mono); margin-top:2px;" id="wa-connected-number">+91...</div>
+                </div>
+              </div>
+              <button id="btn-wa-logout" class="btn btn-secondary btn-sm" style="color:#fb7185; font-size:12px; font-weight:700;">
+                🔌 Disconnect WhatsApp
+              </button>
+            </div>
+
+            <!-- Campaign 1: Requirement-Based Lead Outreach Dispatcher -->
+            <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+                <div>
+                  <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.3); border-radius:12px; padding:2px 10px; margin-bottom:6px;">
+                    <span style="font-size:11px; font-weight:800; color:#60a5fa;">🎯 AUDIT REQUIREMENT PITCH DISPATCHER</span>
+                  </div>
+                  <h4 style="color:var(--text-primary); font-size:16px; font-weight:800; margin-bottom:4px;">1-Click Automated Lead Campaign</h4>
+                  <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+                    Loops through all qualified leads (Google Maps & Instagram) and automatically sends each client's specific requirement pitch (No website, outdated mobile score, missing WhatsApp CTA, or D2C store pitch) with safe anti-ban delay (6–10s).
+                  </p>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:14px;">
+                <button id="btn-start-wa-campaign" class="btn btn-emerald" style="padding:12px 28px; font-size:14px; font-weight:800; box-shadow:0 4px 14px rgba(16,185,129,0.3);">
+                  🚀 Start 1-Click Automated Campaign
+                </button>
+                <button id="btn-stop-wa-campaign" class="btn btn-secondary hidden" style="color:#fb7185; padding:12px 24px; font-weight:700;">
+                  ⏹ Stop Campaign
+                </button>
+                <span style="font-size:12px; color:var(--text-tertiary);">
+                  🛡️ Multi-member anti-duplicate lock active (Already contacted leads are skipped)
+                </span>
+              </div>
+
+              <!-- Campaign Progress Indicator -->
+              <div id="wa-campaign-progress-box" class="hidden" style="margin-top:16px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:var(--radius-sm); padding:16px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:8px;">
+                  <span id="wa-campaign-status-text" style="color:#60a5fa;">Dispatching pitches in background...</span>
+                  <span id="wa-campaign-counter" style="color:var(--text-primary); font-family:var(--font-mono); font-weight:800;">0 / 0</span>
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary);" id="wa-campaign-current-target">Current: ...</div>
+              </div>
+            </div>
           </div>
 
-          <!-- Campaign Progress Indicator -->
-          <div id="wa-campaign-progress-box" class="hidden"
-            style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:var(--radius-sm); padding:16px;">
-            <div
-              style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:8px;">
-              <span id="wa-campaign-status-text" style="color:#60a5fa;">Dispatching pitches in background...</span>
-              <span id="wa-campaign-counter"
-                style="color:var(--text-primary); font-family:var(--font-mono); font-weight:800;">0 / 0</span>
+          <!-- 3. CUSTOM NUMBERS & REQUIREMENT BULK SENDER -->
+          <div class="search-card" style="border: 1px solid rgba(249,115,22,0.35); background: radial-gradient(circle at top right, rgba(249,115,22,0.06), transparent 70%), var(--bg-surface);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
+              <div>
+                <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.3); border-radius:20px; padding:4px 12px; margin-bottom:6px;">
+                  <span style="font-size:12px; font-weight:800; color:var(--brand-orange-dark);">🚀 1-CLICK CUSTOM NUMBER BULK SENDER</span>
+                  <span style="font-size:10px; background:var(--brand-orange); color:#fff; padding:1px 6px; border-radius:10px; font-weight:700;">Paste Any Numbers</span>
+                </div>
+                <h3 style="font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:2px;">Custom Numbers & Requirement Bulk Outreach</h3>
+                <p style="font-size:13px; color:var(--text-secondary);">
+                  Paste any custom phone numbers or 1-click load leads, select the client requirement template, and blast pitches automatically.
+                </p>
+              </div>
             </div>
-            <div style="font-size:12px; color:var(--text-secondary);" id="wa-campaign-current-target">Current: ...</div>
+
+            <!-- Numbers Input & Quick Load Bar -->
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <label for="bulk-custom-numbers" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
+                  Enter / Paste Phone Numbers (Comma, space, or new line separated):
+                </label>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" id="btn-load-ig-numbers" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 9px;">
+                    📸 + Load Instagram Leads
+                  </button>
+                  <button type="button" id="btn-load-maps-numbers" class="btn btn-secondary btn-sm" style="font-size:11px; padding:4px 9px;">
+                    📍 + Load Google Maps Leads
+                  </button>
+                  <button type="button" id="btn-clear-bulk-numbers" class="btn btn-ghost btn-sm" style="font-size:11px; padding:4px 8px; color:#fb7185;">
+                    ✕ Clear
+                  </button>
+                </div>
+              </div>
+
+              <textarea id="bulk-custom-numbers" class="form-control" rows="3" placeholder="e.g. 9811223344, 9876543210, +91 9123456789 (Or click buttons above to auto-load leads)" style="font-family:var(--font-mono); font-size:12px;"></textarea>
+              
+              <div style="font-size:11px; color:var(--text-tertiary); font-weight:600;">
+                Detected: <span id="bulk-numbers-count" style="color:var(--brand-orange-dark); font-weight:800;">0</span> valid numbers ready to message.
+              </div>
+
+              <!-- Pitch Message & Template Selector -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:4px;">
+                <label for="bulk-custom-message" style="font-size:12px; font-weight:700; color:var(--text-secondary);">
+                  Pitch Message (Client Requirement Template):
+                </label>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:11px; color:var(--text-tertiary);">Select Requirement:</span>
+                  <select id="bulk-template-select" class="form-control" style="font-size:11px; padding:3px 8px; height:auto; width:auto; font-weight:600;">
+                    <option value="web-audit">🌐 High-Converting Website Pitch (No Website / Redesign)</option>
+                    <option value="ig-store">🛍️ Instagram WhatsApp Storefront & Catalog Pitch</option>
+                    <option value="speed-opt">⚡ Fast Speed & Mobile Optimization Pitch</option>
+                    <option value="custom">✏️ Custom Requirement Pitch</option>
+                  </select>
+                </div>
+              </div>
+
+              <textarea id="bulk-custom-message" class="pitch-textarea" rows="4"></textarea>
+
+              <!-- Dispatch Action Buttons -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:6px;">
+                <div id="bulk-dispatch-status" style="font-size:12px; font-weight:600;"></div>
+
+                <div style="display:flex; gap:10px;">
+                  <button type="button" id="btn-launch-bulk-web-queue" class="btn btn-secondary" style="font-weight:700; height:42px;">
+                    💬 1-Click Rapid Web Queue
+                  </button>
+                  <button type="button" id="btn-send-bulk-custom-auto" class="btn btn-emerald" style="font-weight:800; height:42px; padding:0 24px; box-shadow:0 4px 14px rgba(16,185,129,0.3);">
+                    🚀 1-Click Blast to All Numbers
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- 3. Optional QR Scan Collapsible (Fallback) -->
-          <details
-            style="margin-top:8px; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
-            <summary
-              style="font-size:12px; font-weight:700; color:var(--text-secondary); cursor:pointer; user-select:none;">
-              📱 Optional: Link Personal WhatsApp via Phone QR Scan (Baileys)
-            </summary>
-            <div style="text-align:center; padding:16px 0 8px;">
-              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
-                Scan QR code from your phone's WhatsApp (Linked Devices) if you want to use phone socket instead of Meta
-                Cloud API:
-              </p>
-              <div id="wa-qr-image-box"
-                style="background:#fff; padding:14px; border-radius:var(--radius-md); display:inline-block; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
-                <div class="spinner" style="margin:20px auto;"></div>
-              </div>
-              <div style="margin-top:10px;">
-                <button id="btn-wa-logout" class="btn btn-secondary btn-sm"
-                  style="color:#fb7185; font-size:11px;">Disconnect Linked Device</button>
-              </div>
-            </div>
-          </details>
         </div>
       </section>
 

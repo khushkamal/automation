@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabTitles = {
     'tab-leads': { title: 'Qualified Leads & Audits', sub: 'Discover local businesses via OpenStreetMap & run deterministic website inspections' },
     'tab-instagram': { title: 'Instagram Business Lead Discovery', sub: 'Random qualified D2C sellers, boutiques, home bakers & service brands with public WhatsApp' },
-    'tab-whatsapp': { title: 'WhatsApp Business Outreach Center', sub: 'Official Meta WhatsApp Business Cloud API & Direct 1-Click Outreach' },
+    'tab-whatsapp': { title: 'WhatsApp Outreach Center', sub: 'Scan QR Code to link your WhatsApp & blast requirement-based audit pitches' },
     'tab-queue': { title: 'Search Queue Manager', sub: 'Manage automated searches for different cities and business categories' },
     'tab-sheets': { title: 'Google Sheets Live Sync', sub: 'Automatic real-time row insertion into your Google Sheet' }
   };
@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (tabId === 'tab-leads') {
       fetchLeads();
     } else if (tabId === 'tab-whatsapp') {
-      loadWhatsAppConfig();
       checkWhatsAppStatus();
     }
   }
@@ -129,6 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnWhatsappOutreach = document.getElementById('btn-whatsapp-outreach');
 
   // WhatsApp Elements
+  const waQrContainer = document.getElementById('wa-qr-container');
+  const waConnectedContainer = document.getElementById('wa-connected-container');
+  const waConnectedNumber = document.getElementById('wa-connected-number');
   const waQrImageBox = document.getElementById('wa-qr-image-box');
   const btnWaLogout = document.getElementById('btn-wa-logout');
   const btnStartWaCampaign = document.getElementById('btn-start-wa-campaign');
@@ -137,17 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const waCampaignStatusText = document.getElementById('wa-campaign-status-text');
   const waCampaignCounter = document.getElementById('wa-campaign-counter');
   const waCampaignCurrentTarget = document.getElementById('wa-campaign-current-target');
-
-  // WhatsApp Cloud API Form Elements
-  const formWaCloudConfig = document.getElementById('form-wa-cloud-config');
-  const waInputPhoneId = document.getElementById('wa-input-phone-id');
-  const waInputAccessToken = document.getElementById('wa-input-access-token');
-  const waInputBizPhone = document.getElementById('wa-input-biz-phone');
-  const waInputAccountId = document.getElementById('wa-input-account-id');
-  const btnTestWaCloud = document.getElementById('btn-test-wa-cloud');
-  const btnSaveWaCloud = document.getElementById('btn-save-wa-cloud');
-  const waCloudTestStatus = document.getElementById('wa-cloud-test-status');
-  const waLiveStatusPill = document.getElementById('wa-live-status-pill');
 
   // Google Sheets Elements
   const sheetsConfigForm = document.getElementById('sheets-config-form');
@@ -878,142 +869,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ================================================================
-  // 9. WHATSAPP CLOUD API CONFIGURATION & STATUS
+  // 9. WHATSAPP DIRECT WEB SOCKET STATUS & QR CONNECTION
   // ================================================================
 
-  async function loadWhatsAppConfig() {
-    try {
-      const res = await fetch('/api/whatsapp/config');
-      const data = await res.json();
-
-      if (waInputPhoneId && data.waPhoneNumberId) waInputPhoneId.value = data.waPhoneNumberId;
-      if (waInputAccessToken && data.waAccessToken) waInputAccessToken.value = data.waAccessToken;
-      if (waInputBizPhone && data.waBusinessPhone) waInputBizPhone.value = data.waBusinessPhone;
-      if (waInputAccountId && data.waAccountId) waInputAccountId.value = data.waAccountId;
-
-      isCloudApiReady = Boolean(data.isConfigured);
-    } catch (err) {
-      console.error('Error loading WhatsApp config:', err);
-    }
-  }
-
-  if (btnTestWaCloud) {
-    btnTestWaCloud.addEventListener('click', async () => {
-      const phoneNumberId = waInputPhoneId ? waInputPhoneId.value.trim() : '';
-      const accessToken = waInputAccessToken ? waInputAccessToken.value.trim() : '';
-
-      if (!phoneNumberId || !accessToken) {
-        alert('Please fill in both Phone Number ID and Access Token before testing.');
-        return;
-      }
-
-      btnTestWaCloud.disabled = true;
-      if (waCloudTestStatus) {
-        waCloudTestStatus.textContent = '⏳ Testing Meta Cloud API connection...';
-        waCloudTestStatus.style.color = '#3b82f6';
-      }
-
-      try {
-        const res = await fetch('/api/whatsapp/test-cloud-api', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phoneNumberId, accessToken })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          if (waCloudTestStatus) {
-            waCloudTestStatus.innerHTML = `✅ Connected to Meta! Verified: <strong>${escapeHtml(data.verifiedName)}</strong> (${escapeHtml(data.displayPhoneNumber || 'Active')})`;
-            waCloudTestStatus.style.color = '#10b981';
-          }
-          if (waInputBizPhone && data.displayPhoneNumber && !waInputBizPhone.value) {
-            waInputBizPhone.value = data.displayPhoneNumber;
-          }
-          checkWhatsAppStatus();
-        } else {
-          if (waCloudTestStatus) {
-            waCloudTestStatus.textContent = `❌ Meta Error: ${data.error || 'Connection failed'}`;
-            waCloudTestStatus.style.color = '#ef4444';
-          }
-        }
-      } catch (err) {
-        if (waCloudTestStatus) {
-          waCloudTestStatus.textContent = `❌ Test Failed: ${err.message}`;
-          waCloudTestStatus.style.color = '#ef4444';
-        }
-      } finally {
-        btnTestWaCloud.disabled = false;
-      }
-    });
-  }
-
-  if (formWaCloudConfig) {
-    formWaCloudConfig.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const waPhoneNumberId = waInputPhoneId ? waInputPhoneId.value.trim() : '';
-      const waAccessToken = waInputAccessToken ? waInputAccessToken.value.trim() : '';
-      const waBusinessPhone = waInputBizPhone ? waInputBizPhone.value.trim() : '';
-      const waAccountId = waInputAccountId ? waInputAccountId.value.trim() : '';
-
-      if (btnSaveWaCloud) btnSaveWaCloud.disabled = true;
-      if (waCloudTestStatus) {
-        waCloudTestStatus.textContent = '💾 Saving credentials...';
-        waCloudTestStatus.style.color = '#3b82f6';
-      }
-
-      try {
-        const res = await fetch('/api/whatsapp/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ waPhoneNumberId, waAccessToken, waBusinessPhone, waAccountId })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          if (waCloudTestStatus) {
-            waCloudTestStatus.textContent = '✅ WhatsApp Business Cloud API settings saved successfully!';
-            waCloudTestStatus.style.color = '#10b981';
-          }
-          isCloudApiReady = Boolean(waPhoneNumberId && waAccessToken);
-          checkWhatsAppStatus();
-        } else {
-          if (waCloudTestStatus) {
-            waCloudTestStatus.textContent = `❌ Failed to save: ${data.error}`;
-            waCloudTestStatus.style.color = '#ef4444';
-          }
-        }
-      } catch (err) {
-        if (waCloudTestStatus) {
-          waCloudTestStatus.textContent = `❌ Error: ${err.message}`;
-          waCloudTestStatus.style.color = '#ef4444';
-        }
-      } finally {
-        if (btnSaveWaCloud) btnSaveWaCloud.disabled = false;
-      }
-    });
-  }
-
-  // Check WhatsApp Status (Cloud API + Baileys fallback)
   async function checkWhatsAppStatus() {
     try {
       const res = await fetch('/api/whatsapp/status');
       const data = await res.json();
 
-      if (data.status === 'CONNECTED_CLOUD_API') {
+      if (data.status === 'CONNECTED') {
         if (navWaBadge) {
-          navWaBadge.textContent = 'Cloud API';
+          navWaBadge.textContent = 'Active';
           navWaBadge.style.background = '#10b981';
           navWaBadge.style.color = '#fff';
         }
         if (waStatusDot) waStatusDot.className = 'status-dot online';
-        if (waSidebarText) waSidebarText.textContent = `WA Business: ${data.cloudApi?.verifiedName || data.user}`;
+        if (waSidebarText) waSidebarText.textContent = `WhatsApp: +${data.user}`;
 
-        if (waLiveStatusPill) {
-          waLiveStatusPill.innerHTML = `🟢 <strong>Meta Cloud API Active</strong> (${escapeHtml(data.cloudApi?.verifiedName || 'Verified')}: ${escapeHtml(data.user)})`;
-          waLiveStatusPill.style.background = 'rgba(16,185,129,0.15)';
-          waLiveStatusPill.style.color = '#059669';
-          waLiveStatusPill.style.border = '1px solid rgba(16,185,129,0.3)';
-        }
+        if (waQrContainer) waQrContainer.classList.add('hidden');
+        if (waConnectedContainer) waConnectedContainer.classList.remove('hidden');
+        if (waConnectedNumber) waConnectedNumber.textContent = `+${data.user}`;
 
         if (data.isCampaignRunning) {
           if (waCampaignProgressBox) waCampaignProgressBox.classList.remove('hidden');
@@ -1027,41 +902,28 @@ document.addEventListener('DOMContentLoaded', () => {
           if (waCampaignProgressBox) waCampaignProgressBox.classList.add('hidden');
         }
 
-      } else if (data.status === 'CONNECTED') {
-        if (navWaBadge) navWaBadge.textContent = 'Active (Phone)';
-        if (waStatusDot) waStatusDot.className = 'status-dot online';
-        if (waSidebarText) waSidebarText.textContent = `WhatsApp: +${data.user}`;
-
-        if (waLiveStatusPill) {
-          waLiveStatusPill.innerHTML = `🟢 <strong>Linked Phone Active</strong> (+${escapeHtml(data.user)})`;
-          waLiveStatusPill.style.background = 'rgba(16,185,129,0.15)';
-          waLiveStatusPill.style.color = '#059669';
-        }
-
-        if (data.isCampaignRunning) {
-          if (waCampaignProgressBox) waCampaignProgressBox.classList.remove('hidden');
-          if (btnStartWaCampaign) btnStartWaCampaign.classList.add('hidden');
-          if (btnStopWaCampaign) btnStopWaCampaign.classList.remove('hidden');
-          if (waCampaignCounter) waCampaignCounter.textContent = `${data.campaignProgress.sent} / ${data.campaignProgress.total}`;
-          if (waCampaignCurrentTarget) waCampaignCurrentTarget.textContent = `Current: ${data.campaignProgress.current}`;
-        } else {
-          if (btnStartWaCampaign) btnStartWaCampaign.classList.remove('hidden');
-          if (btnStopWaCampaign) btnStopWaCampaign.classList.add('hidden');
-        }
-
       } else {
-        if (navWaBadge) navWaBadge.textContent = '1-Click Ready';
-        if (waStatusDot) waStatusDot.className = 'status-dot';
-        if (waSidebarText) waSidebarText.textContent = 'WA: 1-Click Ready';
-
-        if (waLiveStatusPill) {
-          waLiveStatusPill.innerHTML = `⚡ <strong>1-Click DM Mode</strong> (Or enter Meta API above for full automation)`;
-          waLiveStatusPill.style.background = 'rgba(234,88,12,0.1)';
-          waLiveStatusPill.style.color = '#ea580c';
+        if (navWaBadge) {
+          navWaBadge.textContent = 'Scan QR';
+          navWaBadge.style.background = '#f59e0b';
+          navWaBadge.style.color = '#fff';
         }
+        if (waStatusDot) waStatusDot.className = 'status-dot';
+        if (waSidebarText) waSidebarText.textContent = 'WhatsApp: Offline';
+
+        if (waConnectedContainer) waConnectedContainer.classList.add('hidden');
+        if (waQrContainer) waQrContainer.classList.remove('hidden');
 
         if (data.qrCode && waQrImageBox) {
-          waQrImageBox.innerHTML = `<img src="${data.qrCode}" alt="WhatsApp QR Code" style="width:200px; height:200px; display:block;" />`;
+          waQrImageBox.innerHTML = `
+            <img src="${data.qrCode}" alt="WhatsApp QR Code" style="width:240px; height:240px; display:block; margin:0 auto; border-radius:8px;" />
+            <div style="margin-top:10px; font-size:11px; color:#10b981; font-weight:700;">🟢 Live QR Ready - Scan Now</div>
+          `;
+        } else if (waQrImageBox) {
+          waQrImageBox.innerHTML = `
+            <div class="spinner" style="margin:80px auto 16px;"></div>
+            <p style="font-size:12px; color:#64748b; font-weight:600;">Generating QR Code...</p>
+          `;
         }
       }
     } catch (err) {
@@ -1071,7 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnWaLogout) {
     btnWaLogout.addEventListener('click', async () => {
-      if (confirm('Disconnect WhatsApp device?')) {
+      if (confirm('Disconnect WhatsApp device and scan a new QR code?')) {
         await fetch('/api/whatsapp/logout', { method: 'POST' });
         checkWhatsAppStatus();
       }
@@ -1490,7 +1352,6 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchInstagramLeads();
   loadQueueData();
   loadSheetsSettings();
-  loadWhatsAppConfig();
   checkWhatsAppStatus();
-  setInterval(checkWhatsAppStatus, 5000);
+  setInterval(checkWhatsAppStatus, 4000);
 });

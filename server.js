@@ -460,7 +460,7 @@ app.post('/api/sync-all-to-sheets', async (req, res) => {
   }
 });
 
-// 11. WhatsApp Auto-Sender & Official Meta Cloud API Endpoints
+// 11. WhatsApp Direct Web Socket & QR Auto-Sender Endpoints
 import {
   initWhatsApp,
   getWhatsAppStatus,
@@ -468,68 +468,11 @@ import {
   startWhatsAppCampaign,
   stopWhatsAppCampaign,
   logoutWhatsApp,
-  testWhatsAppCloudApiConnection,
   sendBulkCustomWhatsAppMessages
 } from './whatsappService.js';
 
 app.get('/api/whatsapp/status', (req, res) => {
   res.json(getWhatsAppStatus());
-});
-
-// WhatsApp Cloud API Configuration
-app.get('/api/whatsapp/config', (req, res) => {
-  const settings = getSettings();
-  res.json({
-    waPhoneNumberId: settings.waPhoneNumberId || '',
-    waAccessToken: settings.waAccessToken || '',
-    waBusinessPhone: settings.waBusinessPhone || '',
-    waAccountId: settings.waAccountId || '',
-    waApiVersion: settings.waApiVersion || 'v20.0',
-    waMode: settings.waMode || 'CLOUD_API',
-    waVerifiedName: settings.waVerifiedName || '',
-    isConfigured: Boolean(settings.waPhoneNumberId && settings.waAccessToken)
-  });
-});
-
-app.post('/api/whatsapp/config', async (req, res) => {
-  try {
-    const { waPhoneNumberId, waAccessToken, waBusinessPhone, waAccountId, waApiVersion, waMode } = req.body;
-    const settings = getSettings();
-
-    settings.waPhoneNumberId = (waPhoneNumberId || '').trim();
-    settings.waAccessToken = (waAccessToken || '').trim();
-    settings.waBusinessPhone = (waBusinessPhone || '').trim();
-    settings.waAccountId = (waAccountId || '').trim();
-    settings.waApiVersion = (waApiVersion || 'v20.0').trim();
-    settings.waMode = waMode || 'CLOUD_API';
-
-    saveSettings(settings);
-    console.log(`[SETTINGS] Updated WhatsApp Business Cloud API Configuration (Phone ID: ${settings.waPhoneNumberId || 'None'})`);
-
-    res.json({ success: true, settings });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Test Meta WhatsApp Cloud API Connection
-app.post('/api/whatsapp/test-cloud-api', async (req, res) => {
-  const { phoneNumberId, accessToken, apiVersion } = req.body;
-  try {
-    const testResult = await testWhatsAppCloudApiConnection(phoneNumberId, accessToken, apiVersion);
-    
-    // Auto-save verified name & phone number to settings
-    const settings = getSettings();
-    if (testResult.verifiedName) settings.waVerifiedName = testResult.verifiedName;
-    if (testResult.displayPhoneNumber && !settings.waBusinessPhone) {
-      settings.waBusinessPhone = testResult.displayPhoneNumber;
-    }
-    saveSettings(settings);
-
-    res.json({ success: true, ...testResult });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
 });
 
 app.post('/api/whatsapp/init', async (req, res) => {
