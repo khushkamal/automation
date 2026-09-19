@@ -1,0 +1,5 @@
+gspread>=5.10.0
+google-generativeai>=0.8.0
+python-dotenv>=1.0.0
+google-auth>=2.20.0
+oauth2client>=4.1.3
