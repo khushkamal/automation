@@ -4,10 +4,14 @@ node_modules/
 # WhatsApp Private Auth Session (Keep Private!)
 whatsapp_auth/
 
-# Environment Variables & Credentials
+# Environment Variables & Secrets (Keep strictly private)
 .env
-.env.local
+.env.*
+!.env.example
 credentials.json
+service-account*.json
+*.pem
+*.key
 *.json.key
 
 # Python

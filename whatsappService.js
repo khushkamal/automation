@@ -222,8 +222,8 @@ export function generateLeadSpecificPitch(lead = null, options = {}) {
         .replace(/\{handle\}/gi, '');
     }
     return lang === 'en'
-      ? `Hi! We reviewed your local business profile and prepared a custom website & WhatsApp growth audit to help you scale customer inquiries. Would you be open for a quick 2-minute overview?`
-      : `Namaste! Humne aapke business profile ke liye ek custom website & WhatsApp lead generation audit review kiya hai. Kya hum ispar short 2-minute discuss kar sakte hain?`;
+      ? `Hi! We reviewed your business profile at VELTIX & CO. (https://veltrixandco.vercel.app/) and prepared a custom website & automation growth audit to help you scale customer inquiries. Would you be open for a quick 2-minute overview?`
+      : `Namaste! Humne VELTIX & CO. (https://veltrixandco.vercel.app/) se aapke business profile ke liye ek custom website & lead automation audit review kiya hai. Kya hum ispar short 2-minute discuss kar sakte hain?`;
   }
 
   const businessName = lead.businessName || 'Sir/Ma\'am';
@@ -247,23 +247,23 @@ export function generateLeadSpecificPitch(lead = null, options = {}) {
     if (isInstagram) {
       const handle = lead.instagramHandle ? lead.instagramHandle.replace('@', '') : businessName;
       if (isEnglish) {
-        return `Hi ${businessName}! 👋 Loved your Instagram profile (@${handle}) and your ${category}! We help active Instagram brands set up 1-Click WhatsApp Storefronts & instant product catalogs so customers order 24/7 without manual DM delays. Would you be open to a quick 2-minute demo preview?`;
+        return `Hi ${businessName}! 👋 Loved your Instagram profile (@${handle}) and your ${category}! We help active brands at VELTIX & CO. (https://veltrixandco.vercel.app/) set up 1-Click WhatsApp Storefronts & automation so customers order 24/7 without manual delays. Would you be open to a quick 2-minute preview?`;
       }
-      return `Namaste ${businessName}! 👋 Maine aapka Instagram page dekha (@${handle}). Aapka ${category} collection bohot amazing hai! 🔥 Lekin customer inquiries aur orders DMs me manually handle karne me kaafi time lagta hai. Hum aapke brand ke liye 1-Click WhatsApp Automated Storefront setup karte hain jisse customers direct 24/7 order place kar sakein. Kya main aapke sath 2-min ka demo preview share karun?`;
+      return `Namaste ${businessName}! 👋 Maine aapka Instagram page dekha (@${handle}). Aapka ${category} collection bohot amazing hai! Hum VELTIX & CO. (https://veltrixandco.vercel.app/) se 1-Click WhatsApp Automated Storefront setup karte hain jisse customers direct 24/7 order place kar sakein. Kya main aapke sath 2-min ka demo preview share karun?`;
     }
 
     if (isNoWeb) {
       if (isEnglish) {
-        return `Hi ${businessName}, noticed your ${category} practice in ${city} does not have an active website. High-intent clients actively search Google before booking high-value services. We build high-converting websites with instant appointment booking & WhatsApp inquiry funnels. Would you be open for a quick 2-min preview?`;
+        return `Hi ${businessName}, noticed your ${category} practice in ${city} does not have an active website. At VELTIX & CO. (https://veltrixandco.vercel.app/), we build high-converting websites with instant appointment booking & WhatsApp inquiry funnels. Would you be open for a quick 2-min preview?`;
       }
-      return `Namaste ${businessName}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal high-value clients aur patients pehle Google pe verify karke hi appointment book karte hain. Hum aapke business ke liye ek premium website & instant WhatsApp booking system setup kar sakte hain. Kya hum ispar 2-min discuss kar sakte hain?`;
+      return `Namaste ${businessName}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Hum VELTIX & CO. (https://veltrixandco.vercel.app/) se aapke business ke liye ek premium website & instant WhatsApp booking system setup kar sakte hain. Kya hum ispar 2-min discuss kar sakte hain?`;
     }
 
     // Website exists with audit findings
     if (isEnglish) {
-      return `Hi ${businessName}, I reviewed ${website} for your ${category} in ${city} and noticed potential improvements in ${auditReason}. Fixing these can boost your customer inquiries significantly. Can I share a quick 2-min overview?`;
+      return `Hi ${businessName}, I reviewed ${website} for your ${category} in ${city}. We help businesses at VELTIX & CO. (https://veltrixandco.vercel.app/) optimize ${auditReason} and integrate AI automations to boost inquiries. Can I share a quick 2-min overview?`;
     }
-    return `Namaste ${businessName}, maine ${city} me aapke ${category} business ki website ${website} audit ki. Isme ${auditReason} optimize karke aap direct customer inquiries 2x se 3x boost kar sakte hain. Kya main short 2-minute overview share karun?`;
+    return `Namaste ${businessName}, maine ${city} me aapke ${category} business ki website ${website} audit ki. Hum VELTIX & CO. (https://veltrixandco.vercel.app/) se ${auditReason} optimize karke aur AI automations se inquiries 2x boost karte hain. Kya main short 2-minute overview share karun?`;
   }
 
   // Custom template with dynamic variables replacement

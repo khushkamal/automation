@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "leads": "node veltrixLeadGenerator.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc14",

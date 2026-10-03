@@ -462,6 +462,35 @@ out center ${maxResults};`;
     }
   }
 
+  // Fast Fallback: If Overpass mirrors timeout or return 0, use Nominatim direct search
+  try {
+    const nomUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cleanKeyword + ' in ' + cleanCity)}&format=json&limit=${maxResults}&addressdetails=1&extratags=1`;
+    const nomRes = await fetch(nomUrl, {
+      headers: {
+        'User-Agent': 'VeltrixLeadGen/1.0 (contact@veltrixandco.com)',
+        'Accept-Language': 'en-US,en;q=0.9'
+      }
+    });
+    if (nomRes.ok) {
+      const nomItems = await nomRes.json();
+      if (Array.isArray(nomItems) && nomItems.length > 0) {
+        return nomItems.map(item => ({
+          type: item.osm_type || 'node',
+          id: item.osm_id || item.place_id,
+          lat: parseFloat(item.lat),
+          lon: parseFloat(item.lon),
+          tags: {
+            name: item.name || item.display_name.split(',')[0].trim(),
+            'addr:city': item.address?.city || cleanCity,
+            ...item.extratags
+          }
+        }));
+      }
+    }
+  } catch (nomErr) {
+    // Ignore fallback error
+  }
+
   return [];
 }
 
@@ -720,31 +749,28 @@ export async function processElement(elem, queueKeyword, queueCity) {
     };
   }
 
-  // 2. Strict Phone Filter: Do NOT enter or qualify leads without a valid phone number!
-  if (!firstPhone || firstPhone === 'Not listed' || firstPhone === 'DM for Contact' || digits.length < 7) {
-    return {
-      skipped: true,
-      reason: `Filtered: No valid contact/phone number available (${businessName})`,
-      leadId
-    };
-  }
+  // Phone number extraction and verification
+  let phone = 'Search Online / G-Maps';
+  const hasValidPhone = firstPhone && firstPhone !== 'Not listed' && firstPhone !== 'DM for Contact' && digits.length >= 7;
 
-  // 3. Strict Anti-Duplicate Message Lock: NEVER add back anyone who was already messaged!
-  const contactedCheck = isAlreadyContacted(firstPhone, leadId);
-  if (contactedCheck.contacted) {
-    return {
-      skipped: true,
-      reason: `Already Messaged: Client was previously messaged by ${contactedCheck.contactedBy || 'Team'} on ${new Date(contactedCheck.contactedAt).toLocaleDateString()} (${businessName})`,
-      leadId
-    };
-  }
+  if (hasValidPhone) {
+    // Strict Anti-Duplicate Message Lock: NEVER add back anyone who was already messaged!
+    const contactedCheck = isAlreadyContacted(firstPhone, leadId);
+    if (contactedCheck.contacted) {
+      return {
+        skipped: true,
+        reason: `Already Messaged: Client was previously messaged by ${contactedCheck.contactedBy || 'Team'} on ${new Date(contactedCheck.contactedAt).toLocaleDateString()} (${businessName})`,
+        leadId
+      };
+    }
 
-  // Format clean readable phone
-  let phone = firstPhone;
-  if (digits.length === 10 && ['6', '7', '8', '9'].includes(digits[0])) {
-    phone = `+91 ${digits.substring(0, 5)} ${digits.substring(5)}`;
-  } else if (digits.startsWith('91') && digits.length === 12) {
-    phone = `+91 ${digits.substring(2, 7)} ${digits.substring(7)}`;
+    if (digits.length === 10 && ['6', '7', '8', '9'].includes(digits[0])) {
+      phone = `+91 ${digits.substring(0, 5)} ${digits.substring(5)}`;
+    } else if (digits.startsWith('91') && digits.length === 12) {
+      phone = `+91 ${digits.substring(2, 7)} ${digits.substring(7)}`;
+    } else {
+      phone = firstPhone;
+    }
   }
 
   // 2. Strict High-Budget Filter: Discard small micro-stores / low-profit shops
@@ -790,8 +816,8 @@ export async function processElement(elem, queueKeyword, queueCity) {
 
   // ROUTE A: No Website
   const isIndia = isIndianLocation(city, phone);
-  const outreachMessageEnNoWeb = `Hi ${businessName || 'Team'}, noticed your ${category} practice in ${city} does not have an active website. High-intent clients actively search Google before booking high-value services. We build high-converting websites with instant appointment booking & WhatsApp inquiry funnels. Would you be open for a quick 2-min preview?`;
-  const outreachMessageHiNoWeb = `Namaste ${businessName || 'Sir/Ma\'am'}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal high-value clients aur patients pehle Google pe verify karke hi appointment book karte hain. Hum aapke business ke liye ek premium website & instant WhatsApp booking system setup kar sakte hain. Kya hum ispar 2-min discuss kar sakte hain?`;
+  const outreachMessageEnNoWeb = `Hi ${businessName || 'Team'}, noticed your ${category} practice in ${city} does not have an active website. High-intent clients search online before choosing services. At VELTIX & CO. (https://veltrixandco.vercel.app/), we build high-speed websites with instant WhatsApp inquiry funnels. Would you be open for a quick 2-min preview?`;
+  const outreachMessageHiNoWeb = `Namaste ${businessName || 'Sir/Ma\'am'}, maine notice kiya ki ${city} me aapke ${category} business ki koi active website nahi hai. Aaj kal high-value clients pehle online check karte hain. Hum VELTIX & CO. (https://veltrixandco.vercel.app/) se aapke liye modern website & instant WhatsApp booking setup kar sakte hain. Kya hum ispar 2-min discuss kar sakte hain?`;
 
   if (!websiteUrl) {
     leadRecord = {

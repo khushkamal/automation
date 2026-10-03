@@ -10,12 +10,30 @@ import {
   getProcessedIds,
   getSearchQueue,
   saveSearchQueue,
-  clearAllLeads
+  clearAllLeads,
+  getRandomGlobalTarget
 } from './auditEngine.js';
 import {
   generateRandomInstagramLeads,
   addManualInstagramLead
 } from './instagramDiscovery.js';
+import {
+  initWhatsApp,
+  getWhatsAppStatus,
+  sendWhatsAppMessage,
+  startWhatsAppCampaign,
+  stopWhatsAppCampaign,
+  logoutWhatsApp,
+  sendBulkCustomWhatsAppMessages,
+  generateLeadSpecificPitch,
+  findLeadByPhone
+} from './whatsappService.js';
+import { getSentRegistry } from './contactRegistry.js';
+import {
+  runVeltrixLeadGeneration,
+  TARGET_CATEGORIES,
+  VELTIX_CONFIG
+} from './veltrixLeadGenerator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -146,8 +164,6 @@ app.post('/api/run-audit', async (req, res) => {
 });
 
 // 4.1. Run Random Worldwide Audit Endpoint (Clears old data automatically)
-import { getRandomGlobalTarget } from './auditEngine.js';
-
 app.get('/api/random-suggestion', (req, res) => {
   const { region } = req.query;
   const target = getRandomGlobalTarget(region || 'Worldwide');
@@ -487,18 +503,6 @@ app.post('/api/sync-all-to-sheets', async (req, res) => {
 });
 
 // 11. WhatsApp Direct Web Socket & QR Auto-Sender Endpoints
-import {
-  initWhatsApp,
-  getWhatsAppStatus,
-  sendWhatsAppMessage,
-  startWhatsAppCampaign,
-  stopWhatsAppCampaign,
-  logoutWhatsApp,
-  sendBulkCustomWhatsAppMessages,
-  generateLeadSpecificPitch,
-  findLeadByPhone
-} from './whatsappService.js';
-
 app.get('/api/whatsapp/status', (req, res) => {
   res.json(getWhatsAppStatus());
 });
@@ -576,8 +580,6 @@ app.post('/api/whatsapp/start-campaign', async (req, res) => {
   }
 });
 
-import { getSentRegistry } from './contactRegistry.js';
-
 app.get('/api/contact-registry', (req, res) => {
   res.json(getSentRegistry());
 });
@@ -593,11 +595,29 @@ app.post('/api/whatsapp/logout', async (req, res) => {
 // Start WhatsApp on startup
 initWhatsApp();
 
+// 12. VELTIX & CO. Specialized Lead Generator Endpoints
+app.get('/api/veltrix/info', (req, res) => {
+  res.json({
+    config: VELTIX_CONFIG,
+    categories: TARGET_CATEGORIES
+  });
+});
+
+app.post('/api/veltrix/generate', async (req, res) => {
+  const { city = 'Delhi', category = 'clinics', limit = 15 } = req.body;
+  try {
+    const leads = await runVeltrixLeadGeneration({ city, category, limit });
+    res.json({ success: true, count: leads.length, leads });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 const server = app.listen(PORT, () => {
   console.log(`\n================================================================`);
-  console.log(`  🚀 LOCAL BUSINESS LEAD GENERATION & WEBSITE AUDIT SYSTEM`);
+  console.log(`  🚀 VELTIX & CO. — LEAD GENERATION & CLIENT AUTOMATION SYSTEM`);
   console.log(`  🌐 Dashboard URL: http://localhost:${PORT}`);
-  console.log(`  🛡️ 100% Free - OpenStreetMap + Deterministic Auditor`);
+  console.log(`  💼 Portfolio: ${VELTIX_CONFIG.portfolioUrl}`);
   console.log(`================================================================\n`);
   
   // Auto-open browser on Windows

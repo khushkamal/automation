@@ -1,10 +1,11 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title Local Business Lead Generation & Website Audit Automation
+title VELTIX & CO. — Lead Generation & Outreach Automation
 
 echo ================================================================
-echo   LOCAL BUSINESS LEAD GENERATION & WEBSITE AUDIT AUTOMATION
+echo   VELTIX & CO. — LEAD GENERATION & CLIENT AUTOMATION SYSTEM
+echo   Portfolio: https://veltrixandco.vercel.app/
 echo ================================================================
 echo.
 
